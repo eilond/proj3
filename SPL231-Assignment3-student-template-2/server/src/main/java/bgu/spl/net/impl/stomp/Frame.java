@@ -1,4 +1,4 @@
-package bgu.spl.net.srv;
+package bgu.spl.net.impl.stomp;
 
 import java.util.HashMap;
 
