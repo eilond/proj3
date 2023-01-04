@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class StompConnections<T> implements Connections<T>{
     private List<ConnectionHandler<T>> connectionsList = new LinkedList<ConnectionHandler<T>>(); //user ID is the index in list
+    Map<Integer,Integer> userIDtoConHandler = new HashMap<Integer,Integer>(); //from user ID to index of the connection handler in connectionsList
     Map<String,List<Integer>> topics = new HashMap<String,List<Integer>>(); //server topics
 
     @Override
@@ -53,7 +54,7 @@ public class StompConnections<T> implements Connections<T>{
 
     public static void main(String[] args) {
         StompConnections<Integer> s = new StompConnections<>();
-        
+
     }
     
 }

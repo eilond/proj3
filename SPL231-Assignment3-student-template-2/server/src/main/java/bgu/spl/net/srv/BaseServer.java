@@ -17,6 +17,7 @@ public abstract class BaseServer<T> implements Server<T> {
     private ServerSocket sock;
     //added
     Connections<T> connections;
+    int clientIdCounter = 0;
 
     public BaseServer(
             int port,
@@ -47,7 +48,8 @@ public abstract class BaseServer<T> implements Server<T> {
                 //--------------------------
                 //get this instance protocol inorder to start it before sending to handler
                 MessagingProtocol<T> smp = protocolFactory.get();
-                smp.start(0,connections);
+                smp.start(clientIdCounter,connections);
+                clientIdCounter++;
                 //--------------------------
 
                 Socket clientSock = serverSock.accept();
