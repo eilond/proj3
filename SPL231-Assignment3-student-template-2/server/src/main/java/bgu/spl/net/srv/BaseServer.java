@@ -16,7 +16,7 @@ public abstract class BaseServer<T> implements Server<T> {
     private final Supplier<MessageEncoderDecoder<T>> encdecFactory;
     private ServerSocket sock;
     //added
-    Connections<T> connections;
+    StompConnections<T> connections;
     int clientIdCounter = 0;
 
     public BaseServer(
@@ -47,21 +47,22 @@ public abstract class BaseServer<T> implements Server<T> {
                 //added
                 //--------------------------
                 //get this instance protocol inorder to start it before sending to handler
-                MessagingProtocol<T> smp = protocolFactory.get();
-                smp.start(clientIdCounter,connections);
-                clientIdCounter++;
+                MessagingProtocol<T> StompMP = protocolFactory.get();
+                StompMP.start(clientIdCounter,connections);
+                
                 //--------------------------
 
                 Socket clientSock = serverSock.accept();
                 BlockingConnectionHandler<T> handler = new BlockingConnectionHandler<>(
                         clientSock,
                         encdecFactory.get(),
-                        smp
+                        StompMP
                     );
                 
                 //added
                 //----------
-                ((StompConnections<T>)connections).connect(handler);
+                ((StompConnections<T>)connections).connect(clientIdCounter,handler);
+                clientIdCounter++;
                 //----------
                 execute(handler);
             }

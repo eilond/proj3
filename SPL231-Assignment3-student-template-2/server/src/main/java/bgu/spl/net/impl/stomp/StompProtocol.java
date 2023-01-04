@@ -11,9 +11,8 @@ import javafx.util.Pair;
 public class StompProtocol<T> implements StompMessagingProtocol<T> {
     
     private boolean shouldTerminate = false;
-    private Connections<T> connections;
-    int connectionId;
-    List<Pair<String,Integer>> usrSubs = new LinkedList<Pair<String,Integer>>(); //holds all the different subID of this user and the topic they sighed into
+    private StompConnections<T> connections;
+    private UserData usrData;
 
     /**
 	 * Used to initiate the current client protocol with it's personal connection ID and the connections implementation
@@ -21,20 +20,27 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
     @Override
     public void start(int connectionId, Connections<T> connections) {
         // TODO Auto-generated method stub
-        this.connections = connections;
-        this.connectionId = connectionId;
+        this.connections = (StompConnections<T>)connections;
+        this.usrData = new UserData(connectionId);
+        //this.connections.addUserData(connectionId, usrData);
     }
     
     
     public void Process(T message){
+        //SUBSCRIBE SHOULD USE COMPLETEUSERDATA
+        //when subscription is added put the subscription ID in the usrData
 
+        Frame<T> sentStompFrame = new Frame<T>(message);
+        sentStompFrame.getCommandType(); //switch case on all this
+        
     }
 	
 	/**
      * @return true if the connection should be terminated
      */
     public boolean shouldTerminate(){
-        return(shouldTerminate);
+        //TODO IMPLEMENT
+        return(true);
     }
 
 
