@@ -1,16 +1,17 @@
 package bgu.spl.net.impl.stomp;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
-import javafx.util.Pair;
 
 public class UserData {
     int connectionId;
+
+    String acceptVersion;
+    String host;
     String usrName;
     String usrPassCode;
+
     Map<Integer,String> usrSubs; //maps subID to topic
 
     UserData(int connectionId){
@@ -18,7 +19,9 @@ public class UserData {
     }
 
 
-    public void completeUser(String usrName, String usrPassCode,List<Pair<String,Integer>> usrSubs ){
+    public void completeUser(String acceptVersion, String host, String usrName, String usrPassCode ){
+        this.acceptVersion = acceptVersion;
+        this.host = host;
         this.usrName = usrName;
         this.usrPassCode = usrPassCode;
         this.usrSubs = new HashMap<Integer,String>();

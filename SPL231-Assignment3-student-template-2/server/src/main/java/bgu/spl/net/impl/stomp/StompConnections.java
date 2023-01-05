@@ -1,12 +1,11 @@
 package bgu.spl.net.impl.stomp;
 
 
-import bgu.spl.net.srv.BlockingConnectionHandler;
+
 import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.Connections;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +43,10 @@ public class StompConnections<T> implements Connections<T>{
             List<Integer> currList = pair.getValue();
             boolean found = false;
             for(int i=0 ; i < currList.size() & !found ; i++){
-                if(currList.lastIndexOf(connectionId) != -1){
+                int idx = currList.lastIndexOf(connectionId);
+                if(idx != -1){
                     found = true;
-                    currList.remove(connectionId);
+                    currList.remove(idx);
                 }
             }
         }
@@ -84,9 +84,6 @@ public class StompConnections<T> implements Connections<T>{
         topics.put(topic,subs);
     }
 
-    // public void putConnectionHendlers(Integer id , ConnectionHandler<T> Ch) {
-    //     connectionHendlersMap.put(id,Ch);
-    // }
 
     public void printConnections() {
         System.out.println(connectionHendlersMap);
@@ -96,38 +93,38 @@ public class StompConnections<T> implements Connections<T>{
         System.out.println(topics);
     }
 
-    public static void main(String[] args) {
-        StompConnections<String> s = new StompConnections<>();
-        List<Integer> topicHilbaSubs = new LinkedList<Integer>();
-        topicHilbaSubs.add(1);
-        topicHilbaSubs.add(2);
-        topicHilbaSubs.add(3);
+    // public static void main(String[] args) {
+    //     StompConnections<String> s = new StompConnections<>();
+    //     List<Integer> topicHilbaSubs = new LinkedList<Integer>();
+    //     topicHilbaSubs.add(1);
+    //     topicHilbaSubs.add(2);
+    //     topicHilbaSubs.add(3);
        
-        List<Integer> topicShugSubs = new LinkedList<Integer>();
-        topicShugSubs.add(1);
-        s.putTopic("hilba", topicHilbaSubs);
-        s.putTopic("Shug", topicShugSubs);
-        s.printTopics();
+    //     List<Integer> topicShugSubs = new LinkedList<Integer>();
+    //     topicShugSubs.add(1);
+    //     s.putTopic("hilba", topicHilbaSubs);
+    //     s.putTopic("Shug", topicShugSubs);
+    //     s.printTopics();
 
-        //s.addSubToTopic(2, "hilba");
-        s.addSubToTopic(3, "shug");
-        s.printTopics();
-        ConnectionHandler<String> tCH1 = new BlockingConnectionHandler<String>(null, null, null);
-        ConnectionHandler<String> tCH2 = new BlockingConnectionHandler<String>(null, null, null);
-        ConnectionHandler<String> tCH3 = new BlockingConnectionHandler<String>(null, null, null);
+    //     //s.addSubToTopic(2, "hilba");
+    //     s.addSubToTopic(3, "shug");
+    //     s.printTopics();
+    //     ConnectionHandler<String> tCH1 = new BlockingConnectionHandler<String>(null, null, null);
+    //     ConnectionHandler<String> tCH2 = new BlockingConnectionHandler<String>(null, null, null);
+    //     ConnectionHandler<String> tCH3 = new BlockingConnectionHandler<String>(null, null, null);
 
-        s.connect(1, tCH1);
-        s.connect(2, tCH2);
-        s.connect(3, tCH3);
-        //s.printConnections();
-        ConnectionHandler<String> tCH4 = new BlockingConnectionHandler<String>(null, null, null);
-        s.connect(4, tCH4);
-        topicHilbaSubs.add(4);
-        s.printConnections();
-        s.disconnect(1);
-        s.printConnections();
-        s.printTopics();
+    //     s.connect(1, tCH1);
+    //     s.connect(2, tCH2);
+    //     s.connect(3, tCH3);
+    //     //s.printConnections();
+    //     ConnectionHandler<String> tCH4 = new BlockingConnectionHandler<String>(null, null, null);
+    //     s.connect(4, tCH4);
+    //     topicHilbaSubs.add(4);
+    //     s.printConnections();
+    //     s.disconnect(1);
+    //     s.printConnections();
+    //     s.printTopics();
 
-    }
+    // }
     
 }

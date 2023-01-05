@@ -1,11 +1,11 @@
 package bgu.spl.net.impl.stomp;
 
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.Map;
 
 import bgu.spl.net.api.StompMessagingProtocol;
 import bgu.spl.net.srv.Connections;
-import javafx.util.Pair;
+
 
 
 public class StompProtocol<T> implements StompMessagingProtocol<T> {
@@ -13,6 +13,15 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
     private boolean shouldTerminate = false;
     private StompConnections<T> connections;
     private UserData usrData;
+
+    enum CommandType{
+        CONNECT,
+        SEND,
+        SUBSCRIBE,
+        UNSUBSCRIBE,
+        DISCONNECT,
+        ERROR;
+    }
 
     /**
 	 * Used to initiate the current client protocol with it's personal connection ID and the connections implementation
@@ -27,11 +36,25 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
     
     
     public void Process(T message){
-        //SUBSCRIBE SHOULD USE COMPLETEUSERDATA
-        //when subscription is added put the subscription ID in the usrData
-
         Frame<T> sentStompFrame = new Frame<T>(message);
-        sentStompFrame.getCommandType(); //switch case on all this
+        
+        switch(sentStompFrame.getCommandType()){
+            case CONNECT:
+            
+            Map<String,String> sentMap = sentStompFrame.getCommandHeaders();
+            usrData.completeUser(sentMap.get("accept - version"),sentMap.get("host"), sentMap.get("login"),sentMap.get("passcode"));
+                break;
+            case SEND:
+                break;
+            case SUBSCRIBE:
+                break;
+            case UNSUBSCRIBE:
+                break;
+            case DISCONNECT:
+                break;
+            case ERROR:
+                break;
+        }
         
     }
 	
