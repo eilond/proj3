@@ -128,30 +128,30 @@ public class Frame<T>{
         aString = aString + "-------------------------------------------------\n";
         return aString;
     }
-    public static void main(String[] args) {
-        String a = "CONNECT\naccept - version :1.2\n host : stomp . cs . bgu . ac . il\nlogin : meni\npasscode : films\n\nHello Topic a\n^@";
-        Frame<String> frame = new Frame<>(a);
-        System.out.println(frame);
-        a = "SEND\nsubscription :78\nmessage - id :20\n\nHello Topic a\n^@";
-        frame = new Frame<>(a);
-        System.out.println(frame);
-        a = "SUBSCRIBE\nsubscription :78\nmessage - id :20\n\nHello Topic a\n^@";
-        frame = new Frame<>(a);
-        System.out.println(frame);
-        a = "DISCONNECT\nsubscription :78\nmessage - id :20\n\nHello Topic a\n^@";
-        frame = new Frame<>(a);
-        System.out.println(frame);
+    // public static void main(String[] args) {
+    //     String a = "CONNECT\naccept - version :1.2\n host : stomp . cs . bgu . ac . il\nlogin : meni\npasscode : films\n\nHello Topic a\n^@";
+    //     Frame<String> frame = new Frame<>(a);
+    //     System.out.println(frame);
+    //     a = "SEND\nsubscription :78\nmessage - id :20\n\nHello Topic a\n^@";
+    //     frame = new Frame<>(a);
+    //     System.out.println(frame);
+    //     a = "SUBSCRIBE\nsubscription :78\nmessage - id :20\n\nHello Topic a\n^@";
+    //     frame = new Frame<>(a);
+    //     System.out.println(frame);
+    //     a = "DISCONNECT\nsubscription :78\nmessage - id :20\n\nHello Topic a\n^@";
+    //     frame = new Frame<>(a);
+    //     System.out.println(frame);
 
-        a = "EDCKJEIFJE\nsubscription :78\nmessage - id :20\n\nHello Topic a\n^@";
-        frame = new Frame<>(a);
-        System.out.println(frame);
-        a = "";
-        frame = new Frame<>(a);
-        System.out.println(frame);
-        a = " ";
-        frame = new Frame<>(a);
-        System.out.println(frame);
+    //     a = "EDCKJEIFJE\nsubscription :78\nmessage - id :20\n\nHello Topic a\n^@";
+    //     frame = new Frame<>(a);
+    //     System.out.println(frame);
+    //     a = "";
+    //     frame = new Frame<>(a);
+    //     System.out.println(frame);
+    //     a = " ";
+    //     frame = new Frame<>(a);
+    //     System.out.println(frame);
 
         
-    }
+    // }
 }

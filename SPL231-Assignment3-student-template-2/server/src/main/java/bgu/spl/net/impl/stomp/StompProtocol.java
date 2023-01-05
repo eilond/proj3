@@ -36,34 +36,110 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
     
     
     public void Process(T message){
+
         Frame<T> sentStompFrame = new Frame<T>(message);
-        
+        Map<String,String> sentHeaders = sentStompFrame.getCommandHeaders();
+        String retFrame = "";
         switch(sentStompFrame.getCommandType()){
             case CONNECT:
-            
-            Map<String,String> sentMap = sentStompFrame.getCommandHeaders();
-            usrData.completeUser(sentMap.get("accept - version"),sentMap.get("host"), sentMap.get("login"),sentMap.get("passcode"));
+                usrData.completeUser(sentHeaders.get("accept - version"),sentHeaders.get("host"), sentHeaders.get("login"),sentHeaders.get("passcode"));
+                //retFrame = "CONNECTED\nversion"+sentHeaders.get("accept - version")+"\n\n^@";
+                retFrame = "" //SEND CONNECTED FRAME
+                connections.send(usrData.getConnectionId(), (T)retFrame);
                 break;
+            
             case SEND:
+
+                String topicToSendTo = sentHeaders.get("destination");
+                if(topicToSendTo != null){
+                    if (connections.isSubbed(usrData.getConnectionId(), topicToSendTo)){
+                        retFrame = "" //SEND MESSAGE FRAME
+                        connections.send(topicToSendTo, (T)retFrame);
+                    }
+                    else{
+                          // TODO: ERROR FRAME
+                    }
+                }
+                else{ //problem with the user STOMP 
+                     // TODO: ERROR FRAME
+                }
                 break;
             case SUBSCRIBE:
+                try {
+                    
+                    String topicToSubTo = sentHeaders.get("destination");
+                    if(topicToSubTo != null){
+                        int subId = Integer.parseInt(sentHeaders.get("id")); 
+                        if(!connections.topicExist(topicToSubTo)){
+                            connections.addTopic(topicToSubTo, usrData.getConnectionId());
+                        } 
+                        else{
+                            if(!connections.isSubbed(usrData.getConnectionId(), topicToSubTo)){
+                                connections.addSubToTopic(usrData.getConnectionId(), topicToSubTo);
+                                usrData.addSub(subId , topicToSubTo); //saving the topic corresponding to this subID
+                            }
+                            else{ // ERROR - trying to sub more than once to same topic
+                                // TODO: ERROR FRAME
+                            }
+
+                        }
+
+                    }
+                    else{ //ERROR - problem with the user STOMP 
+                        // TODO: ERROR FRAME
+                    }
+                        
+                    
+                } catch (Exception NumberFormatException) {
+                    // TODO: ERROR FRAME
+                }
+                       
+                    
+                
                 break;
             case UNSUBSCRIBE:
+                try {
+                    int subId = Integer.parseInt(sentHeaders.get("id")); 
+                    connections.removeSubFromTopic(usrData.getConnectionId(), usrData.getTopicBySubId(subId)); //removing sub from server's topic list
+                    usrData.removeSub(subId); //removing sub from local user data
+                } catch (Exception NumberFormatException) {
+                    // TODO: handle exception
+                }
+                
                 break;
             case DISCONNECT:
+                int usrReceipt = Integer.parseInt(sentHeaders.get("receipt")); 
+                retFrame = "" //SEND RECIEPT FRAME
+                connections.send(usrData.getConnectionId(), (T)retFrame);
+                connections.disconnect(usrData.getConnectionId()); //removing from subbed topics and connectionHandlers Map in connections
+                usrData.removeAllSubs(); //removing data locally
+                
+                shouldTerminate = true;
                 break;
             case ERROR:
+                retFrame = "" //SEND ERROR FRAME
+                connections.send(usrData.getConnectionId(), (T)retFrame);
+                connections.disconnect(usrData.getConnectionId()); //removing from subbed topics and connectionHandlers Map in connections
+                usrData.removeAllSubs(); //removing data locally
+
+                shouldTerminate = true;
                 break;
         }
         
     }
+
+    public String createStringFrame(String CommandType, Map<String,String> headersToSend, String body){
+        String stompProtocolMessage = ""
+        return(stompProtocolMessage);
+    }
+
 	
 	/**
      * @return true if the connection should be terminated
      */
     public boolean shouldTerminate(){
         //TODO IMPLEMENT
-        return(true);
+        return(shouldTerminate);
     }
 
 
@@ -72,6 +148,9 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
         Process(msg);
         return null;
     }
+
+
+    
 
 
 }

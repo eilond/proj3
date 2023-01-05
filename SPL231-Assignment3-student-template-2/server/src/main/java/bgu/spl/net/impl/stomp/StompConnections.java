@@ -2,10 +2,12 @@ package bgu.spl.net.impl.stomp;
 
 
 
+import bgu.spl.net.srv.BlockingConnectionHandler;
 import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.Connections;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,28 +62,54 @@ public class StompConnections<T> implements Connections<T>{
         
     }
 
-    public boolean addSubToTopic(int subId , String topic) {
+    public boolean addSubToTopic(int connectionId , String topic) {
         // TODO Auto-generated method stub
         List<Integer> topicSubs = topics.get(topic);
         if(topicSubs != null){
-            topicSubs.add(subId);
+            topicSubs.add(connectionId);
         }
         else return false;
         return true;
     }
+
+    public boolean removeSubFromTopic(int connectionId , String topic) {
+        // TODO Auto-generated method stub
+        List<Integer> topicSubs = topics.get(topic);
+        if(topicSubs != null){
+            int idx = topicSubs.indexOf(connectionId);
+            if(idx != -1){
+                topicSubs.remove(idx);
+            }
+            else return false;
+        }
+        else return false;
+        return true;
+    }
+
+    public boolean isSubbed(int connectionId , String topic) {
+        return topics.get(topic).contains(connectionId);
+    }
         
+    public boolean topicExist(String topic) {
+        return topics.get(topic) != null;
+    }
     // public void addUserData(int connectionId , UserData usrData) {
     //     // TODO Auto-generated method stub
     //     allUsersData.put(connectionId, usrData);
         
     // }
         
+    // public ConnectionHandler<T> getConnecyiConnectionHandler(int connectionId) {
+    //     return connectionHendlersMap.get(connectionId);
+    // }
 
 
     //helper functions
 
-    public void putTopic(String topic , List<Integer> subs) {
-        topics.put(topic,subs);
+    public void addTopic(String topic , int connectionId) {
+        List<Integer> topicToAdd = new LinkedList<Integer>();
+        topicToAdd.add(connectionId);
+        topics.put(topic,topicToAdd);
     }
 
 
@@ -99,15 +127,19 @@ public class StompConnections<T> implements Connections<T>{
     //     topicHilbaSubs.add(1);
     //     topicHilbaSubs.add(2);
     //     topicHilbaSubs.add(3);
-       
     //     List<Integer> topicShugSubs = new LinkedList<Integer>();
     //     topicShugSubs.add(1);
-    //     s.putTopic("hilba", topicHilbaSubs);
-    //     s.putTopic("Shug", topicShugSubs);
+       
+
+
+    //     s.addTopic("hilba", topicHilbaSubs);
+    //     s.addTopic("Shug", topicShugSubs);
     //     s.printTopics();
 
     //     //s.addSubToTopic(2, "hilba");
-    //     s.addSubToTopic(3, "shug");
+    //     s.addSubToTopic(3, "Shug");
+    //     s.printTopics();
+    //     s.removeSubFromTopic(1,"Shug" );
     //     s.printTopics();
     //     ConnectionHandler<String> tCH1 = new BlockingConnectionHandler<String>(null, null, null);
     //     ConnectionHandler<String> tCH2 = new BlockingConnectionHandler<String>(null, null, null);
@@ -116,12 +148,18 @@ public class StompConnections<T> implements Connections<T>{
     //     s.connect(1, tCH1);
     //     s.connect(2, tCH2);
     //     s.connect(3, tCH3);
-    //     //s.printConnections();
+    //     s.printConnections();
     //     ConnectionHandler<String> tCH4 = new BlockingConnectionHandler<String>(null, null, null);
     //     s.connect(4, tCH4);
-    //     topicHilbaSubs.add(4);
     //     s.printConnections();
-    //     s.disconnect(1);
+    //     s.addSubToTopic(4, "Shug");
+    //     s.printTopics();
+    //     System.out.println("test removing non existing ConnectionHandler");
+    //     s.disconnect(8);
+    //     s.printConnections();
+    //     s.printTopics();
+    //     System.out.println("test removing existing ConnectionHandler - 3");
+    //     s.disconnect(3);
     //     s.printConnections();
     //     s.printTopics();
 
