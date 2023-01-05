@@ -1,6 +1,7 @@
 package bgu.spl.net.impl.stomp;
 
 
+import bgu.spl.net.srv.BlockingConnectionHandler;
 import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.Connections;
 
@@ -58,6 +59,16 @@ public class StompConnections<T> implements Connections<T>{
         connectionHendlersMap.put(connectionId,connectionHandler);
         
     }
+
+    public boolean addSubToTopic(int subId , String topic) {
+        // TODO Auto-generated method stub
+        List<Integer> topicSubs = topics.get(topic);
+        if(topicSubs != null){
+            topicSubs.add(subId);
+        }
+        else return false;
+        return true;
+    }
         
     // public void addUserData(int connectionId , UserData usrData) {
     //     // TODO Auto-generated method stub
@@ -73,13 +84,49 @@ public class StompConnections<T> implements Connections<T>{
         topics.put(topic,subs);
     }
 
-    public void putConnectionHendlers(Integer id , ConnectionHandler<T> Ch) {
-        connectionHendlersMap.put(id,Ch);
+    // public void putConnectionHendlers(Integer id , ConnectionHandler<T> Ch) {
+    //     connectionHendlersMap.put(id,Ch);
+    // }
+
+    public void printConnections() {
+        System.out.println(connectionHendlersMap);
+    }
+
+    public void printTopics() {
+        System.out.println(topics);
     }
 
     public static void main(String[] args) {
-        StompConnections<Integer> s = new StompConnections<>();
-        
+        StompConnections<String> s = new StompConnections<>();
+        List<Integer> topicHilbaSubs = new LinkedList<Integer>();
+        topicHilbaSubs.add(1);
+        topicHilbaSubs.add(2);
+        topicHilbaSubs.add(3);
+       
+        List<Integer> topicShugSubs = new LinkedList<Integer>();
+        topicShugSubs.add(1);
+        s.putTopic("hilba", topicHilbaSubs);
+        s.putTopic("Shug", topicShugSubs);
+        s.printTopics();
+
+        //s.addSubToTopic(2, "hilba");
+        s.addSubToTopic(3, "shug");
+        s.printTopics();
+        ConnectionHandler<String> tCH1 = new BlockingConnectionHandler<String>(null, null, null);
+        ConnectionHandler<String> tCH2 = new BlockingConnectionHandler<String>(null, null, null);
+        ConnectionHandler<String> tCH3 = new BlockingConnectionHandler<String>(null, null, null);
+
+        s.connect(1, tCH1);
+        s.connect(2, tCH2);
+        s.connect(3, tCH3);
+        //s.printConnections();
+        ConnectionHandler<String> tCH4 = new BlockingConnectionHandler<String>(null, null, null);
+        s.connect(4, tCH4);
+        topicHilbaSubs.add(4);
+        s.printConnections();
+        s.disconnect(1);
+        s.printConnections();
+        s.printTopics();
 
     }
     
