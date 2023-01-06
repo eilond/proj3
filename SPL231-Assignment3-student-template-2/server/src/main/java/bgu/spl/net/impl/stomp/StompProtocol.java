@@ -1,9 +1,13 @@
 package bgu.spl.net.impl.stomp;
 
 
+
+import java.util.HashMap;
 import java.util.Map;
 
 import bgu.spl.net.api.StompMessagingProtocol;
+import bgu.spl.net.srv.BlockingConnectionHandler;
+import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.Connections;
 
 
@@ -11,6 +15,7 @@ import bgu.spl.net.srv.Connections;
 public class StompProtocol<T> implements StompMessagingProtocol<T> {
     
     private boolean shouldTerminate = false;
+    //private boolean isConnected = false;
     private StompConnections<T> connections;
     private UserData usrData;
 
@@ -28,7 +33,6 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
      **/
     @Override
     public void start(int connectionId, Connections<T> connections) {
-        // TODO Auto-generated method stub
         this.connections = (StompConnections<T>)connections;
         this.usrData = new UserData(connectionId);
         //this.connections.addUserData(connectionId, usrData);
@@ -36,16 +40,19 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
     
     
     public void Process(T message){
-
         Frame<T> sentStompFrame = new Frame<T>(message);
         Map<String,String> sentHeaders = sentStompFrame.getCommandHeaders();
         String retFrame = "";
+        Map<String,String> retHeaders = new HashMap<>();
         switch(sentStompFrame.getCommandType()){
             case CONNECT:
-                usrData.completeUser(sentHeaders.get("accept - version"),sentHeaders.get("host"), sentHeaders.get("login"),sentHeaders.get("passcode"));
+                usrData.completeUser(sentHeaders.get("accept-version"),sentHeaders.get("host"), sentHeaders.get("login"),sentHeaders.get("passcode"));
                 //retFrame = "CONNECTED\nversion"+sentHeaders.get("accept - version")+"\n\n^@";
-                retFrame = "" //SEND CONNECTED FRAME
+                retHeaders.put("version", usrData.getAcceptVersion());
+                retFrame = createStringStompFrame("CONNECTED",retHeaders,"");
                 connections.send(usrData.getConnectionId(), (T)retFrame);
+
+                //isConnected = true;
                 break;
             
             case SEND:
@@ -53,15 +60,25 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
                 String topicToSendTo = sentHeaders.get("destination");
                 if(topicToSendTo != null){
                     if (connections.isSubbed(usrData.getConnectionId(), topicToSendTo)){
-                        retFrame = "" //SEND MESSAGE FRAME
+                        int usrSubId = usrData.getSubIdByTopic(topicToSendTo);
+
+                        retHeaders.put("subscription", Integer.toString(usrSubId));
+                        retHeaders.put("message-id",Integer.toString(connections.generateMessageId()));
+                        retHeaders.put("destination", topicToSendTo);
+
+                        retFrame = createStringStompFrame("MESSAGE", retHeaders, sentStompFrame.getCommandBody());
                         connections.send(topicToSendTo, (T)retFrame);
-                    }
-                    else{
-                          // TODO: ERROR FRAME
+                    } 
+                    else{ //if this connection is not subbed to the topic
+                        retHeaders.put("message","you are not subbed to topic " + topicToSendTo);
+                        String msg = message.toString();
+                        disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getCommandBody() + "\n------------");
                     }
                 }
-                else{ //problem with the user STOMP 
-                     // TODO: ERROR FRAME
+                else{ //problem with the user STOMP destination header
+                    retHeaders.put("message","destination recieved was invalid");
+                    String msg = message.toString();
+                    disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getCommandBody() + "\n------------");
                 }
                 break;
             case SUBSCRIBE:
@@ -72,26 +89,32 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
                         int subId = Integer.parseInt(sentHeaders.get("id")); 
                         if(!connections.topicExist(topicToSubTo)){
                             connections.addTopic(topicToSubTo, usrData.getConnectionId());
-                        } 
+                            usrData.addSub(subId , topicToSubTo); //saving the topic corresponding to this subID
+                        }
                         else{
                             if(!connections.isSubbed(usrData.getConnectionId(), topicToSubTo)){
                                 connections.addSubToTopic(usrData.getConnectionId(), topicToSubTo);
                                 usrData.addSub(subId , topicToSubTo); //saving the topic corresponding to this subID
                             }
                             else{ // ERROR - trying to sub more than once to same topic
-                                // TODO: ERROR FRAME
+                                retHeaders.put("message","you are already subbed to this topic");
+                                String msg = message.toString();
+                                disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getCommandBody() + "\n------------");
                             }
 
                         }
 
                     }
-                    else{ //ERROR - problem with the user STOMP 
-                        // TODO: ERROR FRAME
-                    }
+                    else{ //problem with the user STOMP destination header 
+                        retHeaders.put("message","destination recieved was invalid");
+                        String msg = message.toString();
+                        disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getCommandBody() + "\n------------");                    }
                         
                     
-                } catch (Exception NumberFormatException) {
-                    // TODO: ERROR FRAME
+                } catch (Exception NumberFormatException) { //used incase parseInt method has illegal argumnts
+                    retHeaders.put("message","id recieved was invalid");
+                    String msg = message.toString();
+                    disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getCommandBody() + "\n------------");
                 }
                        
                     
@@ -103,42 +126,60 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
                     connections.removeSubFromTopic(usrData.getConnectionId(), usrData.getTopicBySubId(subId)); //removing sub from server's topic list
                     usrData.removeSub(subId); //removing sub from local user data
                 } catch (Exception NumberFormatException) {
-                    // TODO: handle exception
+                    retHeaders.put("message","id recieved was invalid");
+                    String msg = message.toString();
+                    disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getCommandBody() + "\n------------");
                 }
                 
                 break;
             case DISCONNECT:
-                int usrReceipt = Integer.parseInt(sentHeaders.get("receipt")); 
-                retFrame = "" //SEND RECIEPT FRAME
-                connections.send(usrData.getConnectionId(), (T)retFrame);
-                connections.disconnect(usrData.getConnectionId()); //removing from subbed topics and connectionHandlers Map in connections
-                usrData.removeAllSubs(); //removing data locally
-                
-                shouldTerminate = true;
+                String usrReceipt = sentHeaders.get("receipt");
+                retHeaders.put("receipt - id", usrReceipt);
+                disconnectUsr("RECEIPT", retHeaders, "");
                 break;
             case ERROR:
-                retFrame = "" //SEND ERROR FRAME
-                connections.send(usrData.getConnectionId(), (T)retFrame);
-                connections.disconnect(usrData.getConnectionId()); //removing from subbed topics and connectionHandlers Map in connections
-                usrData.removeAllSubs(); //removing data locally
-
-                shouldTerminate = true;
+                retHeaders.put("message","command recieved was invalid");
+                String msg = message.toString();
+                disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getCommandBody() + "\n------------");
                 break;
         }
         
     }
 
-    public String createStringFrame(String CommandType, Map<String,String> headersToSend, String body){
-        String stompProtocolMessage = ""
+    public String createStringStompFrame(String commandType, Map<String,String> headersToSend, String body){
+        String stompProtocolMessage = commandType + "\n";
+        // int lastItCounter = headersToSend.size();
+        // if(commandType == "ERROR"){
+        //     String s1 = "the message:\n" + "------------\n";
+        //     String s2 = "\n------------";
+        //     body.subs
+        // }
+        for(Map.Entry<String,String> pair : headersToSend.entrySet()){
+            stompProtocolMessage = stompProtocolMessage + pair.getKey() + " : " + pair.getValue() + "\n";
+            // if(lastItCounter != 1) stompProtocolMessage = stompProtocolMessage + "\n";
+            // lastItCounter--;
+        }
+
+        if(!body.equals("")) stompProtocolMessage = stompProtocolMessage + "\n" + body + "\n";
+        else stompProtocolMessage = stompProtocolMessage + "\n";
+        // stompProtocolMessage = stompProtocolMessage + "^@";
+
         return(stompProtocolMessage);
     }
 
+    public void disconnectUsr(String commandType,Map<String,String> retHeaders, String body){
+        String retStompFrame = createStringStompFrame(commandType, retHeaders, body);
+        connections.send(usrData.getConnectionId(), (T)retStompFrame);
+        connections.disconnect(usrData.getConnectionId()); //removing from subbed topics and connectionHandlers Map in connections
+        usrData.removeAllSubs(); //removing data locally
+        shouldTerminate = true;
+        //isConnected = false;
+    }
 	
 	/**
      * @return true if the connection should be terminated
      */
     public boolean shouldTerminate(){
-        //TODO IMPLEMENT
         return(shouldTerminate);
     }
 
@@ -149,8 +190,66 @@ public class StompProtocol<T> implements StompMessagingProtocol<T> {
         return null;
     }
 
+    //helper functions
+    public StompConnections<T> gConnections(){
+        return connections;
+    }
 
-    
+
+    public static void main(String[] args) {
+        StompProtocol<String> protocol = new StompProtocol<>();
+        StompConnections<String> mconnectionss = new StompConnections<>();
+        // mconnectionss.createDummyConnections();
+        protocol.start(1, mconnectionss); //this protocol isentifies with id = 0 connection handler (connectionId)
+
+
+        // mconnectionss.addTopic("hilba", 1);
+        // mconnectionss.addTopic("Shug", 1);
+        // mconnectionss.addSubToTopic(2, "hilba");
+        // mconnectionss.addSubToTopic(3, "hilba");
+        // mconnectionss.addSubToTopic(4, "Shug");
+
+        ConnectionHandler<String> tCH1 = new BlockingConnectionHandler<String>(null, null, null);
+        ConnectionHandler<String> tCH2 = new BlockingConnectionHandler<String>(null, null, null);
+        ConnectionHandler<String> tCH3 = new BlockingConnectionHandler<String>(null, null, null);
+        ConnectionHandler<String> tCH4 = new BlockingConnectionHandler<String>(null, null, null);
+
+        mconnectionss.connect(1, tCH1);
+        mconnectionss.connect(2, tCH2);
+        mconnectionss.connect(3, tCH3);
+        mconnectionss.connect(4, tCH4);
+        
+        
+
+        String CONNECT = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:films\n\n^@";
+        String SUBSCRIBE = "SUBSCRIBE\ndestination:hilba\nid:78\n\n^@";
+        String SEND = "SEND\ndestination:hilba\n\nHello topic a\n^@";
+        //String SEND = "SEND\ndestination :/ topic / a\n\nHello topic a\n^@";
+        String UNSUBSCRIBE = "UNSUBSCRIBE\nid:78\n\n^@";
+        String DISCONNECT = "DISCONNECT\nreceipt:77\n\n^@";
+        String ERROR = "dfdf";
+        protocol.process(CONNECT);
+        protocol.process(SUBSCRIBE);
+        protocol.process(SEND);
+        protocol.process(UNSUBSCRIBE);
+        protocol.process(DISCONNECT);
+        protocol.process(ERROR);
+
+        // StompProtocol<String> sp1 = new StompProtocol<>();
+        // StompProtocol<String> sp2 = new StompProtocol<>();
+        // StompConnections<String> mconnectionss = new StompConnections<>();
+        // sp1.start(0, mconnectionss);
+        // sp2.start(1, mconnectionss);
+        // mconnectionss.createDummyConnections();
+        // mconnectionss.printConnections();
+        // mconnectionss.printTopics();
+        // sp1.gConnections().removeSubFromTopic(1, "hilba");
+        // System.out.println(sp1.gConnections());
+        // System.out.println(mconnectionss);
+        
+
+
+    }
 
 
 }

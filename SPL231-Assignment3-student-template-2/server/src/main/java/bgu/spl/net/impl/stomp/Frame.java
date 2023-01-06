@@ -3,10 +3,6 @@ package bgu.spl.net.impl.stomp;
 import java.util.HashMap;
 
 public class Frame<T>{
-    // enum Origin{
-    //     Server,
-    //     Client;
-    // }
 
     enum CommandType{
         CONNECT,
@@ -17,62 +13,11 @@ public class Frame<T>{
         ERROR;
     }
 
-    // public Origin CommandOrigin;
     public CommandType commandType;
     public HashMap<String,String> commandHeaders;
     public String commandBody ="";
-
-
-    private void createType(String connection){
-        switch(connection){
-            case "CONNECT":
-                // CommandOrigin = Origin.Client;
-                commandType = CommandType.CONNECT;
-                break;
-
-            case "SEND":
-                // CommandOrigin = Origin.Client;
-                commandType = CommandType.SEND;
-                break;
-
-            case "SUBSCRIBE":
-                // CommandOrigin = Origin.Client;
-                commandType = CommandType.SUBSCRIBE;
-                break;
-
-            case "UNSUBSCRIBE":
-                // CommandOrigin = Origin.Client;
-                commandType = CommandType.UNSUBSCRIBE;
-                break;
-            case "DISCONNECT":
-                // CommandOrigin = Origin.Client;
-                commandType = CommandType.DISCONNECT;
-                break;
-            // case "CONNECTED":
-            //     CommandOrigin=Origin.Server;
-            //     commandType = CommandType.CONNECTED;
-            //     break;
-            // case "MESSAGE":
-            //     CommandOrigin=Origin.Server;
-            //     commandType = CommandType.MESSAGE;
-            //     break;
-            // case "RECEIPT":
-            //     CommandOrigin=Origin.Server;
-            //     commandType = CommandType.RECEIPT;
-            //     break;
-            // case "ERROR":
-            //     CommandOrigin=Origin.Server;
-            //     commandType = CommandType.ERROR;
-            //     break;
-            default:
-                commandType = CommandType.ERROR;
-            
-        }
-    }
-
-
-
-    Frame(T frame){
+    
+    public Frame(T frame){
         commandHeaders = new HashMap<String,String>();
         if(frame instanceof String){
             
@@ -93,16 +38,57 @@ public class Frame<T>{
                         }
                         else{
                             String[] header = lines[i].split(":");
-                            commandHeaders.putIfAbsent(header[0].replaceAll(" ", ""),header[1].replaceAll(" ", ""));
+                            commandHeaders.putIfAbsent(header[0].trim(), header[1].trim());
+                            // commandHeaders.putIfAbsent(header[0].substring(0,header[0].length()-1),header[1].substring(1)); //for spaces 
                         }
     
                         
                     }
                 }
             }
+            else{
+                commandBody = frame.toString();
+            }
+            
         }
 
     }
+
+
+    private void createType(String connection){
+        switch(connection){
+            case "CONNECT":
+                
+                commandType = CommandType.CONNECT;
+                break;
+
+            case "SEND":
+            
+                commandType = CommandType.SEND;
+                break;
+
+            case "SUBSCRIBE":
+            
+                commandType = CommandType.SUBSCRIBE;
+                break;
+
+            case "UNSUBSCRIBE":
+            
+                commandType = CommandType.UNSUBSCRIBE;
+                break;
+            case "DISCONNECT":
+                
+                commandType = CommandType.DISCONNECT;
+                break;
+            default:
+
+                commandType = CommandType.ERROR;
+            
+        }
+    }
+
+
+
                 
         
 
