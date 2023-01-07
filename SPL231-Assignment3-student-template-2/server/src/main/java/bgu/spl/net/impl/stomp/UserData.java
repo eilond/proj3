@@ -81,5 +81,12 @@ public class UserData {
     public String getAcceptVersion(){
         return acceptVersion;
     }
+
+    public String getUserName(){
+        return usrName;
+    }
+    public String getUserPasscode(){
+        return usrPassCode;
+    }
     
 }

@@ -16,8 +16,10 @@ public class Frame<T>{
     public CommandType commandType;
     public HashMap<String,String> commandHeaders;
     public String commandBody ="";
+    public T frameSent;
     
     public Frame(T frame){
+        frameSent = frame;
         commandHeaders = new HashMap<String,String>();
         if(frame instanceof String){
             
@@ -46,9 +48,9 @@ public class Frame<T>{
                     }
                 }
             }
-            else{
-                commandBody = frame.toString();
-            }
+            // else{
+            //     commandBody = frame.toString();
+            // }
             
         }
 
@@ -102,6 +104,9 @@ public class Frame<T>{
     }
     public String getCommandBody(){
         return commandBody;
+    }
+    public T getFrameSent(){
+        return frameSent;
     }
     
     @Override
