@@ -146,7 +146,7 @@ public class StompConnections<T> implements Connections<T>{
         }
     }
 
-    public void connectUser(String usrName,String passCode){
+    public void connectUser(String usrName, String passCode){
         Pair<String,AtomicBoolean>  p = users.get(usrName);
         if(p != null){
             p.getValue().compareAndSet(false, true);

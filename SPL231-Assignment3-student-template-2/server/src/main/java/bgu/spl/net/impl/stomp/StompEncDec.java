@@ -7,9 +7,6 @@ import java.util.Arrays;
 public class StompEncDec implements MessageEncoderDecoder<String> {
     boolean mightFinish = false;
 
-
-
-    //ALL OLD FUNCTIONSSS
     private byte[] bytes = new byte[1 << 10]; //start with 1k
     private int len = 0;
 
@@ -35,7 +32,7 @@ public class StompEncDec implements MessageEncoderDecoder<String> {
 
     @Override
     public byte[] encode(String message) {
-        return (message + "\n").getBytes(); //uses utf8 by default
+        return (message).getBytes(); //uses utf8 by default
     }
 
     private void pushByte(byte nextByte) {
@@ -55,13 +52,13 @@ public class StompEncDec implements MessageEncoderDecoder<String> {
     }
 
 
-    // public static void main(String[] args) {
-    //     String msg = "1^1^1^@";
-    //     StompEncDec a = new StompEncDec();
-    //     byte[] decmsg = a.encode(msg);
-    //     for(Byte b : decmsg){
-    //         System.out.println(a.decodeNextByte(b));
+    public static void main(String[] args) {
+        String msg = "1^1^1^@";
+        StompEncDec a = new StompEncDec();
+        byte[] decmsg = a.encode(msg);
+        for(Byte b : decmsg){
+            System.out.println(a.decodeNextByte(b));
 
-    //     }
-    // }
+        }
+    }
 }

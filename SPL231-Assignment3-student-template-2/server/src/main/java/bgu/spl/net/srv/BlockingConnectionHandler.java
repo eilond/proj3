@@ -39,6 +39,7 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
                     //     out.flush();
                     // }
                     //------added--------
+                    // System.out.println(nextMessage);
                     protocol.process(nextMessage);
                     //------added--------
 
@@ -60,6 +61,7 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     @Override
     public void send(T msg) {
         try {
+            // System.out.println(msg);
             out.write(encdec.encode(msg));
             out.flush();
             
