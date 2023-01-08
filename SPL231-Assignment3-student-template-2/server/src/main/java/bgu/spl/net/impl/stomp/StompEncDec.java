@@ -7,9 +7,6 @@ import java.util.Arrays;
 public class StompEncDec implements MessageEncoderDecoder<String> {
     boolean mightFinish = false;
 
-
-
-    //ALL OLD FUNCTIONSSS
     private byte[] bytes = new byte[1 << 10]; //start with 1k
     private int len = 0;
 
@@ -17,16 +14,23 @@ public class StompEncDec implements MessageEncoderDecoder<String> {
     public String decodeNextByte(byte nextByte) {
         //notice that the top 128 ascii characters have the same representation as their utf-8 counterparts
         //this allow us to do the following comparison
-        if (nextByte == '^') {
-            mightFinish = true;
-        }
-        else if (mightFinish & nextByte == '@') {
-            mightFinish = false;
-            return popString();
-        }
-        else if(mightFinish){
-            mightFinish = false;
+        // if (nextByte == '^') {
+        //     mightFinish = true;
+        // }
+        // else if (mightFinish & nextByte == '@') {
+        //     mightFinish = false;
+        //     return popString();
+        // }
+        // else if(mightFinish){
+        //     mightFinish = false;
 
+        // }
+
+        // pushByte(nextByte);
+        // return null; //not a line yet
+        System.out.print((char)nextByte);
+        if (nextByte == '\u0000') {
+            return popString();
         }
 
         pushByte(nextByte);
@@ -35,7 +39,7 @@ public class StompEncDec implements MessageEncoderDecoder<String> {
 
     @Override
     public byte[] encode(String message) {
-        return (message + "\n").getBytes(); //uses utf8 by default
+        return (message + '\u0000').getBytes(); //uses utf8 by default
     }
 
     private void pushByte(byte nextByte) {
@@ -51,17 +55,17 @@ public class StompEncDec implements MessageEncoderDecoder<String> {
         //this is not actually required as it is the default encoding in java.
         String result = new String(bytes, 0, len, StandardCharsets.UTF_8);
         len = 0;
-        return result + "@";
+        return result + "^@";
     }
 
 
-    // public static void main(String[] args) {
-    //     String msg = "1^1^1^@";
-    //     StompEncDec a = new StompEncDec();
-    //     byte[] decmsg = a.encode(msg);
-    //     for(Byte b : decmsg){
-    //         System.out.println(a.decodeNextByte(b));
+    public static void main(String[] args) {
+        String msg = "1^1^1^@";
+        StompEncDec a = new StompEncDec();
+        byte[] decmsg = a.encode(msg);
+        for(Byte b : decmsg){
+            System.out.println(a.decodeNextByte(b));
 
-    //     }
-    // }
+        }
+    }
 }

@@ -9,15 +9,15 @@ public class StompServer {
         // you can use any server... 
         Server.threadPerClient(
                 7777, //port
-                () -> new StompProtocol<>(), //protocol factory
+                () -> new StompProtocol(), //protocol factory
                 StompEncDec::new //message encoder decoder factory
         ).serve();
 
         // Server.reactor(
         //         Runtime.getRuntime().availableProcessors(),
         //         7777, //port
-        //         () -> new EchoProtocol<>(), //protocol factory
-        //         LineMessageEncoderDecoder::new //message encoder decoder factory
+        //         () -> new StompProtocol(), //protocol factory
+        //         StompEncDec::new //message encoder decoder factory
         // ).serve();
     }
 }

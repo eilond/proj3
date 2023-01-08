@@ -41,4 +41,10 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
         len = 0;
         return result;
     }
+
+    public static void main(String[] args) {
+        System.out.print("printng here:");
+        System.out.print('\u0000');
+
+    }
 }

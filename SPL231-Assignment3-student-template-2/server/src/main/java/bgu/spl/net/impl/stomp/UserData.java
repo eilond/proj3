@@ -36,15 +36,19 @@ public class UserData {
 
     public void removeSub(Integer subID){
         String topicRemoved = usrSubIdToTopic.remove(subID);
-        usrTopicToSubId.remove(topicRemoved);
+        if(topicRemoved != null) usrTopicToSubId.remove(topicRemoved);
     }
 
     public void removeAllSubs(){ 
-        for(Map.Entry<Integer , String> entry: usrSubIdToTopic.entrySet()){
-            String topicRemoved = usrSubIdToTopic.remove(entry.getKey());
-            usrTopicToSubId.remove(topicRemoved);
-            
+        if(usrSubIdToTopic != null){
+            // for(Map.Entry<Integer , String> entry: usrSubIdToTopic.entrySet()){
+            //     String topicRemoved = usrSubIdToTopic.remove(entry.getKey());
+            //     usrTopicToSubId.remove(topicRemoved);
+                
+            // }
+            usrSubIdToTopic.clear();
         }
+        if(usrTopicToSubId != null) usrTopicToSubId.clear();
         
     }
     
@@ -76,6 +80,13 @@ public class UserData {
     }
     public String getAcceptVersion(){
         return acceptVersion;
+    }
+
+    public String getUserName(){
+        return usrName;
+    }
+    public String getUserPasscode(){
+        return usrPassCode;
     }
     
 }
