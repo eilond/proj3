@@ -13,6 +13,7 @@ bgu/spl/net/srv/Server.class
 bgu/spl/net/impl/echo/EchoClient.class
 bgu/spl/net/impl/rci/RemoteCommandInvocationProtocol.class
 bgu/spl/net/impl/echo/EchoProtocol.class
+bgu/spl/net/impl/stomp/StompProtocol$1.class
 bgu/spl/net/impl/echo/EchoServer.class
 bgu/spl/net/impl/newsfeed/NewsFeedClientMain.class
 bgu/spl/net/srv/NonBlockingConnectionHandler.class

@@ -34,23 +34,21 @@ public class Frame<T>{
                        startBody = true;
                     }
     
-                    if(!lines[i].equals("^@")){
+                    if(!lines[i].equals("\u0000")){
                         if(startBody){
                             commandBody = commandBody + lines[i];
                         }
                         else{
                             String[] header = lines[i].split(":");
                             commandHeaders.putIfAbsent(header[0].trim(), header[1].trim());
-                            // commandHeaders.putIfAbsent(header[0].substring(0,header[0].length()-1),header[1].substring(1)); //for spaces 
+                            
                         }
     
                         
                     }
                 }
             }
-            // else{
-            //     commandBody = frame.toString();
-            // }
+           
             
         }
 

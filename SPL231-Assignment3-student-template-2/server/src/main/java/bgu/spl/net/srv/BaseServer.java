@@ -39,18 +39,16 @@ public abstract class BaseServer<T> implements Server<T> {
     public void serve() {
 
         try (ServerSocket serverSock = new ServerSocket(port)) {
-			System.out.println("Server started");
+			System.out.println("TPC Server started");
 
             this.sock = serverSock; //just to be able to close
             while (!Thread.currentThread().isInterrupted()) {
                 
-                //added
-                //--------------------------
+                //-------------added-------------
                 //get this instance protocol inorder to start it before sending to handler
                 MessagingProtocol<T> StompMP = protocolFactory.get();
                 StompMP.start(clientIdCounter,connections);
-                
-                //--------------------------
+                //-------------added-------------
 
                 Socket clientSock = serverSock.accept();
                 BlockingConnectionHandler<T> handler = new BlockingConnectionHandler<>(
@@ -59,11 +57,11 @@ public abstract class BaseServer<T> implements Server<T> {
                         StompMP
                     );
                 
-                //added
-                //----------
+                
+                //-------------added-------------
                 ((StompConnections<T>)connections).connect(clientIdCounter,handler);
                 clientIdCounter++;
-                //----------
+                //-------------added-------------
                 execute(handler);
             }
         } catch (IOException ex) {

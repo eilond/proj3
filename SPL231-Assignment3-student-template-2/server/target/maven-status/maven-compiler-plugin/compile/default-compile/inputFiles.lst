@@ -1,5 +1,6 @@
 /home/users/bsc/2023/eilondu/spl/SPL231-Assignment3-student-template-2/server/src/main/java/bgu/spl/net/impl/stomp/StompConnections.java
 /home/users/bsc/2023/eilondu/spl/SPL231-Assignment3-student-template-2/server/src/main/java/bgu/spl/net/impl/newsfeed/NewsFeedClientMain.java
+/home/users/bsc/2023/eilondu/spl/SPL231-Assignment3-student-template-2/server/src/main/java/bgu/spl/net/impl/echo/EchoEchoClient.java
 /home/users/bsc/2023/eilondu/spl/SPL231-Assignment3-student-template-2/server/src/main/java/bgu/spl/net/srv/NonBlockingConnectionHandler.java
 /home/users/bsc/2023/eilondu/spl/SPL231-Assignment3-student-template-2/server/src/main/java/bgu/spl/net/impl/rci/ObjectEncoderDecoder.java
 /home/users/bsc/2023/eilondu/spl/SPL231-Assignment3-student-template-2/server/src/main/java/bgu/spl/net/impl/rci/RemoteCommandInvocationProtocol.java
