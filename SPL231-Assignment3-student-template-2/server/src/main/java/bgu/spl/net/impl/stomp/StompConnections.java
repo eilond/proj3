@@ -2,12 +2,10 @@ package bgu.spl.net.impl.stomp;
 
 
 
-import bgu.spl.net.srv.BlockingConnectionHandler;
 import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.Connections;
 import javafx.util.Pair;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +32,7 @@ public class StompConnections<T> implements Connections<T>{
 
     @Override
     public boolean send(int connectionId, T msg) { //should use the connectionHendlersMap to get the connection handlers
-        // TODO Implement
+
         // System.out.printf("send function returned connectionId:%d\n" , (connectionId));
         // System.out.println("send function recived this message:");
         // System.out.println(msg);
@@ -45,7 +43,7 @@ public class StompConnections<T> implements Connections<T>{
 
     @Override
     public void send(String channel, T msg) { //should use the topics field to get all the users subbed to the topic
-        // TODO Test this
+        
         List<Integer> subs = topics.get(channel);
         if(subs != null){
             for(Integer connectionID : subs){
@@ -57,7 +55,7 @@ public class StompConnections<T> implements Connections<T>{
 
     @Override
     public void disconnect(int connectionId) {
-        // TODO make thread safe
+
         connectionHendlersMap.remove(connectionId);
         for(Map.Entry<String,List<Integer>> pair : topics.entrySet()){
             List<Integer> currList = pair.getValue();
@@ -173,6 +171,11 @@ public class StompConnections<T> implements Connections<T>{
         }
     }
 
+    public void addTopic(String topic , int connectionId) {
+        List<Integer> topicToAdd = new LinkedList<Integer>();
+        topicToAdd.add(connectionId);
+        topics.put(topic,topicToAdd);
+    }
 
 
 
@@ -189,73 +192,66 @@ public class StompConnections<T> implements Connections<T>{
 
     //testing functions
 
-    public void addTopic(String topic , int connectionId) {
-        List<Integer> topicToAdd = new LinkedList<Integer>();
-        topicToAdd.add(connectionId);
-        topics.put(topic,topicToAdd);
-    }
+    // public void printConnections() {
+    //     System.out.println(connectionHendlersMap);
+    // }
 
+    // public void printTopics() {
+    //     System.out.println(topics);
+    // }
 
-    public void printConnections() {
-        System.out.println(connectionHendlersMap);
-    }
+    // public void createDummyConnections(){
+    //     addTopic("hilba", 1);
+    //     addTopic("Shug", 1);
+    //     addSubToTopic(2, "hilba");
+    //     addSubToTopic(3, "hilba");
+    //     addSubToTopic(4, "Shug");
 
-    public void printTopics() {
-        System.out.println(topics);
-    }
-
-    public void createDummyConnections(){
-        addTopic("hilba", 1);
-        addTopic("Shug", 1);
-        addSubToTopic(2, "hilba");
-        addSubToTopic(3, "hilba");
-        addSubToTopic(4, "Shug");
-
-        ConnectionHandler<T> tCH1 = new BlockingConnectionHandler<T>(null, null, null);
-        ConnectionHandler<T> tCH2 = new BlockingConnectionHandler<T>(null, null, null);
-        ConnectionHandler<T> tCH3 = new BlockingConnectionHandler<T>(null, null, null);
-        ConnectionHandler<T> tCH4 = new BlockingConnectionHandler<T>(null, null, null);
-        connect(4, tCH4);
-        connect(1, tCH1);
-        connect(2, tCH2);
-        connect(3, tCH3);
+    //     ConnectionHandler<T> tCH1 = new BlockingConnectionHandler<T>(null, null, null);
+    //     ConnectionHandler<T> tCH2 = new BlockingConnectionHandler<T>(null, null, null);
+    //     ConnectionHandler<T> tCH3 = new BlockingConnectionHandler<T>(null, null, null);
+    //     ConnectionHandler<T> tCH4 = new BlockingConnectionHandler<T>(null, null, null);
+    //     connect(4, tCH4);
+    //     connect(1, tCH1);
+    //     connect(2, tCH2);
+    //     connect(3, tCH3);
         
-    }
+    // }
 
-    public static void main(String[] args) {
-        StompConnections<String> s = new StompConnections<>();
+    // public static void main(String[] args) {
+    //     StompConnections<String> s = new StompConnections<>();
 
-        s.addTopic("hilba", 1);
-        s.addTopic("Shug", 1);
-        s.addSubToTopic(2, "hilba");
-        s.addSubToTopic(3, "hilba");
-        s.addSubToTopic(4, "Shug");
-        System.out.println("init topics are:");
-        s.printTopics();
+    //     s.addTopic("hilba", 1);
+    //     s.addTopic("Shug", 1);
+    //     s.addSubToTopic(2, "hilba");
+    //     s.addSubToTopic(3, "hilba");
+    //     s.addSubToTopic(4, "Shug");
+    //     System.out.println("init topics are:");
+    //     s.printTopics();
         
-        ConnectionHandler<String> tCH1 = new BlockingConnectionHandler<String>(null, null, null);
-        ConnectionHandler<String> tCH2 = new BlockingConnectionHandler<String>(null, null, null);
-        ConnectionHandler<String> tCH3 = new BlockingConnectionHandler<String>(null, null, null);
+    //     ConnectionHandler<String> tCH1 = new BlockingConnectionHandler<String>(null, null, null);
+    //     ConnectionHandler<String> tCH2 = new BlockingConnectionHandler<String>(null, null, null);
+    //     ConnectionHandler<String> tCH3 = new BlockingConnectionHandler<String>(null, null, null);
 
-        s.connect(1, tCH1);
-        s.connect(2, tCH2);
-        s.connect(3, tCH3);
-        // s.printConnections();
-        ConnectionHandler<String> tCH4 = new BlockingConnectionHandler<String>(null, null, null);
-        s.connect(4, tCH4);
-        // s.printConnections();
-        // s.addSubToTopic(4, "Shug");
-        s.printTopics();
+    //     s.connect(1, tCH1);
+    //     s.connect(2, tCH2);
+    //     s.connect(3, tCH3);
+    //     // s.printConnections();
+    //     ConnectionHandler<String> tCH4 = new BlockingConnectionHandler<String>(null, null, null);
+    //     s.connect(4, tCH4);
+    //     // s.printConnections();
+    //     // s.addSubToTopic(4, "Shug");
+    //     s.printTopics();
 
-        System.out.println("test removing non existing ConnectionHandler");
-        s.disconnect(8);
-        s.printConnections();
-        s.printTopics();
-        System.out.println("test removing existing ConnectionHandler - 3");
-        s.disconnect(3);
-        s.printConnections();
-        s.printTopics();
+    //     System.out.println("test removing non existing ConnectionHandler");
+    //     s.disconnect(8);
+    //     s.printConnections();
+    //     s.printTopics();
+    //     System.out.println("test removing existing ConnectionHandler - 3");
+    //     s.disconnect(3);
+    //     s.printConnections();
+    //     s.printTopics();
 
-    }
+    // }
     
 }

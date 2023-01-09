@@ -39,7 +39,7 @@ public abstract class BaseServer<T> implements Server<T> {
     public void serve() {
 
         try (ServerSocket serverSock = new ServerSocket(port)) {
-			System.out.println("Server started");
+			System.out.println("TPC Server started");
 
             this.sock = serverSock; //just to be able to close
             while (!Thread.currentThread().isInterrupted()) {

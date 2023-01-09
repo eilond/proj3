@@ -41,31 +41,11 @@ public class UserData {
 
     public void removeAllSubs(){ 
         if(usrSubIdToTopic != null){
-            // for(Map.Entry<Integer , String> entry: usrSubIdToTopic.entrySet()){
-            //     String topicRemoved = usrSubIdToTopic.remove(entry.getKey());
-            //     usrTopicToSubId.remove(topicRemoved);
-                
-            // }
             usrSubIdToTopic.clear();
         }
         if(usrTopicToSubId != null) usrTopicToSubId.clear();
         
     }
-    
-
-    // public Map<Integer , String> removeAllSubs(){ //removing user subs then returning clone object for protocol to delete in connections
-    //     Map<Integer , String> retMap = usrSubIdToTopic;
-
-    //     for(Map.Entry<Integer , String> entry: usrSubIdToTopic.entrySet()){
-    //         usrSubIdToTopic.remove(entry.getKey());
-    //     }
-
-    //     return retMap;
-    // }
-
-    // public Integer findSubscriptionId(String topic){
-    //     return usrSubIdToTopic.get(topic);
-    // }
 
     public String getTopicBySubId(Integer subId){
         return usrSubIdToTopic.get(subId);

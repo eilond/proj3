@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import bgu.spl.net.api.StompMessagingProtocol;
-import bgu.spl.net.srv.BlockingConnectionHandler;
-import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.Connections;
 
 
@@ -58,7 +56,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                         if(connections.isUserConnected(usrName)){ //someone is logged in 
                             
                             retHeaders.put("message","user is already logged in");
-                            disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------" + sentStompFrame.getFrameSent() + "\n------------");
+                            disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");
                         }
                         else{ //no one is logged in 
                             connectCase(sentStompFrame);
@@ -66,7 +64,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                     }
                     else{//incorrect password from client
                         retHeaders.put("message","wrong password");
-                        disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------" + sentStompFrame.getFrameSent() + "\n------------");
+                        disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");
                     }
                 }
                 break;
@@ -86,12 +84,12 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                     } 
                     else{ //if this connection is not subbed to the topic
                         retHeaders.put("message","you are not subbed to topic " + topicToSendTo);
-                        disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------" + sentStompFrame.getFrameSent() + "\n------------");
+                        disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");
                     }
                 }
                 else{ //problem with the user STOMP destination header
                     retHeaders.put("message","destination recieved was invalid");
-                    disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------" + sentStompFrame.getFrameSent() + "\n------------");
+                    disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");
                 }
                 break;
             case SUBSCRIBE:
@@ -111,7 +109,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                             }
                             else{ // ERROR - trying to sub more than once to same topic
                                 retHeaders.put("message","you are already subbed to this topic");
-                                disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------" + sentStompFrame.getFrameSent() + "\n------------");
+                                disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");
                             }
 
                         }
@@ -119,12 +117,12 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                     }
                     else{ //problem with the user STOMP destination header 
                         retHeaders.put("message","destination recieved was invalid");
-                        disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------" + sentStompFrame.getFrameSent() + "\n------------");                    }
+                        disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");                    }
                         
                     
                 } catch (Exception NumberFormatException) { //used incase parseInt method has illegal argumnts
                     retHeaders.put("message","id recieved was invalid");
-                    disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------" + sentStompFrame.getFrameSent() + "\n------------");
+                    disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");
                 }
                        
                     
@@ -137,7 +135,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                     usrData.removeSub(subId); //removing sub from local user data
                 } catch (Exception NumberFormatException) {
                     retHeaders.put("message","id recieved was invalid");
-                    disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------" + sentStompFrame.getFrameSent() + "\n------------");
+                    disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");
                 }
                 
                 break;
@@ -148,7 +146,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                 break;
             case ERROR:
                 retHeaders.put("message","command recieved was invalid");
-                disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------" + sentStompFrame.getFrameSent() + "\n------------");
+                disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");
                 break;
         }
         
@@ -211,65 +209,65 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     }
 
 
-    public static void main(String[] args) {
-        StompProtocol protocol = new StompProtocol();
-        StompConnections<String> mconnectionss = new StompConnections<>();
-        // mconnectionss.createDummyConnections();
-        protocol.start(1, mconnectionss); //this protocol isentifies with id = 0 connection handler (connectionId)
+    // public static void main(String[] args) {
+    //     StompProtocol protocol = new StompProtocol();
+    //     StompConnections<String> mconnectionss = new StompConnections<>();
+    //     // mconnectionss.createDummyConnections();
+    //     protocol.start(1, mconnectionss); //this protocol isentifies with id = 0 connection handler (connectionId)
 
 
-        // mconnectionss.addTopic("hilba", 1);
-        // mconnectionss.addTopic("Shug", 1);
-        // mconnectionss.addSubToTopic(2, "hilba");
-        // mconnectionss.addSubToTopic(3, "hilba");
-        // mconnectionss.addSubToTopic(4, "Shug");
+    //     // mconnectionss.addTopic("hilba", 1);
+    //     // mconnectionss.addTopic("Shug", 1);
+    //     // mconnectionss.addSubToTopic(2, "hilba");
+    //     // mconnectionss.addSubToTopic(3, "hilba");
+    //     // mconnectionss.addSubToTopic(4, "Shug");
 
-        ConnectionHandler<String> tCH1 = new BlockingConnectionHandler<String>(null, null, null);
-        ConnectionHandler<String> tCH2 = new BlockingConnectionHandler<String>(null, null, null);
-        ConnectionHandler<String> tCH3 = new BlockingConnectionHandler<String>(null, null, null);
-        ConnectionHandler<String> tCH4 = new BlockingConnectionHandler<String>(null, null, null);
+    //     ConnectionHandler<String> tCH1 = new BlockingConnectionHandler<String>(null, null, null);
+    //     ConnectionHandler<String> tCH2 = new BlockingConnectionHandler<String>(null, null, null);
+    //     ConnectionHandler<String> tCH3 = new BlockingConnectionHandler<String>(null, null, null);
+    //     ConnectionHandler<String> tCH4 = new BlockingConnectionHandler<String>(null, null, null);
 
-        mconnectionss.connect(1, tCH1);
-        mconnectionss.connect(2, tCH2);
-        mconnectionss.connect(3, tCH3);
-        mconnectionss.connect(4, tCH4);
+    //     mconnectionss.connect(1, tCH1);
+    //     mconnectionss.connect(2, tCH2);
+    //     mconnectionss.connect(3, tCH3);
+    //     mconnectionss.connect(4, tCH4);
         
-        protocol.process("^@");
+    //     protocol.process("^@");
 
-        String CONNECT = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:films\n\n^@";
-        // String SUBSCRIBE = "SUBSCRIBE\ndestination:hilba\nid:78\n\n^@";
-        // String SEND = "SEND\ndestination:hilba\n\nHello topic a\n^@";
-        // //String SEND = "SEND\ndestination :/ topic / a\n\nHello topic a\n^@";
-        // String UNSUBSCRIBE = "UNSUBSCRIBE\nid:78\n\n^@";
-        String DISCONNECT = "DISCONNECT\nreceipt:77\n\n^@";
-        // String ERROR = "dfdf";
-        protocol.process(CONNECT);
-        // protocol.process(SUBSCRIBE);
-        // protocol.process(SEND);
-        // protocol.process(UNSUBSCRIBE);
-        protocol.process(DISCONNECT);
-        protocol.process(CONNECT); //loging into created user
-        // String CONNECTWRONGPASSCODE = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:ilms\n\n^@";
-        // protocol.process(CONNECTWRONGPASSCODE);
-        String CONNECTCONNECTEDUSER = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:films\n\n^@";
-        protocol.process(CONNECTCONNECTEDUSER);
-        // protocol.process(ERROR);
+    //     String CONNECT = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:films\n\n^@";
+    //     // String SUBSCRIBE = "SUBSCRIBE\ndestination:hilba\nid:78\n\n^@";
+    //     // String SEND = "SEND\ndestination:hilba\n\nHello topic a\n^@";
+    //     // //String SEND = "SEND\ndestination :/ topic / a\n\nHello topic a\n^@";
+    //     // String UNSUBSCRIBE = "UNSUBSCRIBE\nid:78\n\n^@";
+    //     String DISCONNECT = "DISCONNECT\nreceipt:77\n\n^@";
+    //     // String ERROR = "dfdf";
+    //     protocol.process(CONNECT);
+    //     // protocol.process(SUBSCRIBE);
+    //     // protocol.process(SEND);
+    //     // protocol.process(UNSUBSCRIBE);
+    //     protocol.process(DISCONNECT);
+    //     protocol.process(CONNECT); //loging into created user
+    //     // String CONNECTWRONGPASSCODE = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:ilms\n\n^@";
+    //     // protocol.process(CONNECTWRONGPASSCODE);
+    //     String CONNECTCONNECTEDUSER = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:films\n\n^@";
+    //     protocol.process(CONNECTCONNECTEDUSER);
+    //     // protocol.process(ERROR);
 
-        // StompProtocol<String> sp1 = new StompProtocol<>();
-        // StompProtocol<String> sp2 = new StompProtocol<>();
-        // StompConnections<String> mconnectionss = new StompConnections<>();
-        // sp1.start(0, mconnectionss);
-        // sp2.start(1, mconnectionss);
-        // mconnectionss.createDummyConnections();
-        // mconnectionss.printConnections();
-        // mconnectionss.printTopics();
-        // sp1.gConnections().removeSubFromTopic(1, "hilba");
-        // System.out.println(sp1.gConnections());
-        // System.out.println(mconnectionss);
+    //     // StompProtocol<String> sp1 = new StompProtocol<>();
+    //     // StompProtocol<String> sp2 = new StompProtocol<>();
+    //     // StompConnections<String> mconnectionss = new StompConnections<>();
+    //     // sp1.start(0, mconnectionss);
+    //     // sp2.start(1, mconnectionss);
+    //     // mconnectionss.createDummyConnections();
+    //     // mconnectionss.printConnections();
+    //     // mconnectionss.printTopics();
+    //     // sp1.gConnections().removeSubFromTopic(1, "hilba");
+    //     // System.out.println(sp1.gConnections());
+    //     // System.out.println(mconnectionss);
         
 
 
-    }
+    // }
 
 
 }

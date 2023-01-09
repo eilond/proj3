@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-public class EchoClient {
+public class EchoEchoClient {
 
     public static void main(String[] args) throws IOException {
         
@@ -29,11 +29,10 @@ public class EchoClient {
     
             // System.out.println("sending message to server");
             //TEST 1
-            String msg1 = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:films\n\n\u0000";
-            msg1 = msg1 + "SUBSCRIBE\ndestination:shug\nid:78\n\n\u0000";
-            msg1 = msg1 + "SUBSCRIBE\ndestination:hilba\nid:79\n\n\u0000";
-            msg1 = msg1 + "SEND\ndestination:shug\n\nHello topic a\u0000";
-
+            String msg1 = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:eilon\npasscode:hilba\n\n\u0000";
+            msg1 = msg1 + "SUBSCRIBE\ndestination:shug\nid:79\n\n\u0000";
+            // msg1 = msg1 + "SUBSCRIBE\ndestination:hilba\nid:79\n\n\u0000";
+            // msg1 = msg1 + "UNSUBSCRIBE\nid:78\n\n\u0000";
 
             //TEST 2
             // String msg1 = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:films\n\n\u0000";
@@ -43,7 +42,6 @@ public class EchoClient {
             // msg1 = msg1 + "SEND\ndestination:hilba\n\nHello topic a\u0000";
 
             // String msg1 = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:films\n\n\u0000";
-            // msg1 = msg1 + "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:eilon\npasscode:hilba\n\n\u0000";
             // msg1 = msg1 + "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:films\n\n\u0000"; //ERROR
             // msg1 = msg1 + "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:eilon\npasscode:hilba\n\n\u0000";
             // msg1 = msg1 + "SUBSCRIBE\ndestination:shug\nid:78\n\n\u0000";
@@ -80,15 +78,14 @@ public class EchoClient {
             
             System.out.println("message from server: ");
             String line  = "";
-            while(line != null){
+            while(true){
                 line = in.readLine();
                 // System.out.println( "    a   ");
-                System.out.println( line);
+                if(line != null) System.out.println( line);
 
             }
 
-           
-
+            // System.out.println( "im here");
 
             // try (Socket sock1 = new Socket(args[0], 7777);
             //     BufferedReader in1 = new BufferedReader(new InputStreamReader(sock1.getInputStream()));
