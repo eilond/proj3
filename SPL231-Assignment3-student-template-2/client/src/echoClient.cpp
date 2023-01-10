@@ -24,8 +24,9 @@ int main (int argc, char *argv[]) {
         char buf[bufsize];
         std::cin.getline(buf, bufsize);
 		std::string line(buf);
+        std::string msg1 = "CONNECT\naccept-version:1.2\nhost:stomp . cs . bgu . ac . il\nlogin:meni\npasscode:films\n\n\0";
 		int len=line.length();
-        if (!connectionHandler.sendLine(line)) {
+        if (!connectionHandler.sendFrameAscii(msg1,'\0')) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
             break;
         }
@@ -40,7 +41,7 @@ int main (int argc, char *argv[]) {
         std::string answer;
         // Get back an answer: by using the expected number of bytes (len bytes + newline delimiter)
         // We could also use: connectionHandler.getline(answer) and then get the answer without the newline char at the end
-        if (!connectionHandler.getLine(answer)) {
+        if (!connectionHandler.getFrameAscii(answer,'\0')) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
             break;
         }

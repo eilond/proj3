@@ -16,6 +16,10 @@ private:
 public:
 	ConnectionHandler(std::string host, short port);
 
+	void updateHandler(std::string host, short port);
+
+	void print(){std::cout<<host_<<":"<<port_<<std::endl;};
+
 	virtual ~ConnectionHandler();
 
 	// Connect to the remote machine

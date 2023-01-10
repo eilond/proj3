@@ -14,7 +14,10 @@ ConnectionHandler::ConnectionHandler(string host, short port) : host_(host), por
 ConnectionHandler::~ConnectionHandler() {
 	close();
 }
-
+// void ConnectionHandler::updateHandler(string host, short port){
+// 	host_ = host;
+// 	port_ = port;
+// }
 bool ConnectionHandler::connect() {
 	std::cout << "Starting connect to "
 	          << host_ << ":" << port_ << std::endl;
