@@ -40,6 +40,7 @@ public class StompEncDec implements MessageEncoderDecoder<String> {
         //this is not actually required as it is the default encoding in java.
         String result = new String(bytes, 0, len, StandardCharsets.UTF_8);
         len = 0;
+        if(result.equalsIgnoreCase("")) return null;
         return result;
     }
 

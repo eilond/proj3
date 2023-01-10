@@ -7,7 +7,7 @@ public class StompServer {
     public static void main(String[] args) {
         
         if (args.length == 0) {
-            args = new String[]{"7777", "tpc"};
+            args = new String[]{"7777", "reactor"};
         }
     
         if (args.length < 2) {
