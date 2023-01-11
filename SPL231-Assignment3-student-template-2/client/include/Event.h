@@ -6,6 +6,7 @@
 #include "../include/Frame.h"
 #include <vector>
 
+using namespace std;
 class Event
 {
 private:
@@ -25,9 +26,13 @@ private:
     std::map<std::string, std::string> team_b_updates;
     // description of the event
     std::string description;
+    std::vector<std::string> SplitMessege(string s,string delimiter);
+    int addToUpdatesmap(map<string,string>& updates,vector<string>& messageVec, int fromWhere,string next_updates);
 
 public:
+    std::string to_Summary();
     Event(std::string name, std::string team_a_name, std::string team_b_name, int time, std::map<std::string, std::string> game_updates, std::map<std::string, std::string> team_a_updates, std::map<std::string, std::string> team_b_updates, std::string discription);
+    Event(std::vector<Event>);
     Event(const std::string & frame_body);
     virtual ~Event();
     const std::string &get_team_a_name() const;

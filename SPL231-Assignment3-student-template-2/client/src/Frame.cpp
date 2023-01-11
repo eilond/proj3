@@ -119,7 +119,7 @@ Frame::Frame(string message,Origin from):origin(nullOrigin),type(nullType),heade
         origin = Server;
         createServerFrame(lines);
     }
-    else if(lines[0] == "MESSEGE"){
+    else if(lines[0] == "MESSAGE"){
         type = MESSAGE;
         origin = Server;
         createServerFrame(lines);

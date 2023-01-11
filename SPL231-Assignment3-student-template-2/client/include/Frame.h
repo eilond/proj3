@@ -14,7 +14,6 @@ enum Origin{nullOrigin,Server,Client};
 enum ConnectionType{nullType,CONNECT,SEND,SUBSCRIBE,UNSUBSCRIBE,DISCONNECT,CONNECTED,MESSAGE,RECEIPT,ERROR};
 class Frame{
     private:
-        vector<std::string> splitMessege(std::string s,std::string delimiter);
         Origin origin;
         ConnectionType type;
         map<string,string> headers;
@@ -24,6 +23,7 @@ class Frame{
         void createServerFrame(vector<string>& vec);
         void createClientFrame(vector<string>& vec);
     public:
+        vector<std::string> splitMessege(std::string s,std::string delimiter);
         string& getBody();
         Frame(string messege,Origin from);
         Frame(const Frame&);

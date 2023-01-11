@@ -7,6 +7,7 @@
 #include "../include/Event.h"
 #include <memory>
 #include "../include/Summary.h"
+
 using namespace std;
 // TODO: implement the STOMP protocol
 class StompProtocol
@@ -20,5 +21,6 @@ private:
         void proccesFromServer();
         void proccesFromClient();
         void handleReport(string messege);
+        void proccesMESSEGE(Frame& recived,string& messege);
 
 };

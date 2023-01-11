@@ -7,10 +7,12 @@ using namespace std;
 class Summary
 {
 private:
-    map<string,vector<Event>> user_summary;
+    map<string, map<string,vector<Event>>> user_summary;
 public:
     Summary(/* args */);
-    map<string,vector<Event>>& getMap();
+    map<string, map<string,vector<Event>>>& getMap();
+    
+    vector<Event> get_user_game_summary(string user,string game,string path);
     void add_event_to_user(string user,Event);
     void add_events_to_user(string user,vector<Event> v2);
 };

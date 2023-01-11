@@ -5,7 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <memory>
-
+#include <fstream>
 #include "../include/KeyPressThread.h"
 using namespace std;
 vector<string> splitMessege(string s,string delimiter){
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     //     }
 	while(1){
 		try{
-			const short bufsize = 1024;
+ 			const short bufsize = 1024;
 			char buf[bufsize];
 			std::cin.getline(buf, bufsize);
 			string loginString(buf);

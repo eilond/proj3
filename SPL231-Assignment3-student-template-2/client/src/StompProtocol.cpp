@@ -1,5 +1,17 @@
 #include "../include/StompProtocol.h"
-
+#include <fstream>
+vector<string> SplitMessege(string s,string delimiter){
+    size_t pos = 0;
+    string token;
+    vector<string> a;
+    while ((pos = s.find(delimiter)) != std::string::npos) {
+        token = s.substr(0, pos);
+        a.push_back(token);
+        s.erase(0, pos + delimiter.length());
+    } 
+    a.push_back(s);
+    return a;   
+}
 StompProtocol::StompProtocol(StompClient* client_):client(nullptr){
     client = client_;
 };
@@ -40,9 +52,20 @@ void StompProtocol::proccesFromServer(){
             break;
         }
         Frame recived(recive,Server);
-        if(!client->isConnected()&&(recived.getType()==RECEIPT)){
+        cout<<"\u001b[32m_____________________________________"<<endl;
+        cout<<recived.getType()<<endl;
+        cout<<"_____________________________________\u001b[0m"<<endl;
+        if(recived.getType()==MESSAGE){
+            proccesMESSEGE(recived,recive);
+        }
+        // the addition of the || in the end might not work;
+        //join /germany_japan
+        //report events1.json
+        map<string, map<string,vector<Event>>>& Mappp = client->getSummary().getMap();
+        if(!client->isConnected()&&((recived.getType()==RECEIPT)||(recived.getType()==ERROR))){
             client->handshake_ = (stoi(recived.getHeaders()["id"]) == client->getDisconectRecit());
             client->getHandler().close();
+            client->Disonnect();
         }
         cout<<"\u001b[32m_____________________________________"<<endl;
         cout<<recive<<endl;
@@ -56,15 +79,41 @@ void StompProtocol::proccesFromClient(){
         std::cin.getline(buf, bufsize);
 		std::string line(buf);
         if((line.substr(0,5)=="print")){
-            cout<<"here"<<endl;
-				for(auto e: client->getSummary().getMap()[client->getName()]){
-					cout<<"\u001b[31m"+e.to_Frame_string("yuval")+"\u001b[0m"<<endl;
-				}
+                try{
+                    cout<<line.substr(6)<<endl;
+                    vector<Event> a =client->getSummary().getMap()[line.substr(6)]["germany_japan"];
+                    for(auto e: client->getSummary().getMap()[line.substr(6)]["germany_japan"]){
+					    cout<<"\u001b[31m"+e.to_Frame_string("yuval")+"\u001b[0m"<<endl;
+                    }
+                }
+                catch(std::exception e){
+                    for(auto e: client->getSummary().getMap()[client->getName()]["germany_japan"]){
+                        cout<<"\u001b[31m"+e.to_Frame_string("yuval")+"\u001b[0m"<<endl;
+                    }
+                }
 			}
-         cout<<line.substr(0,6)<<endl;
-        cout<<(line.substr(0,6)!="report")<<endl;
-        cout<<(line.find(' ')==0)<<endl;
-        if((line.substr(0,6)!="report")){
+        else if((line.substr(0,6)=="report")){
+                   handleReport(line);
+        }
+        else if((line.substr(0,7)=="summary")){
+            vector<string> lines = SplitMessege(line, " ");
+            // client->getSummary().get_user_game_summary(lines[2],lines[1],lines[3]);
+            vector<Event> nne = client->getSummary().getMap()[lines[2]][lines[1]];
+            Event t(nne);
+            for(Event e: nne){
+                cout<<e.to_Frame_string("yuval")<<endl;
+            }
+            string a = t.to_Summary();
+            string path1 = "./data/client.text";
+            std::ofstream file(path1);
+            cout<<a<<endl;
+            file << a;
+            file.close();;
+        }
+        else if((line.substr(0,5)=="login")){
+                   cout<<"\u001b[31mClient already logged in\u001b[0m"<<endl;
+        }
+        else{
             Frame frameToSend(line,Client);
             client->checkFrame(frameToSend);
             line = frameToSend.toString();
@@ -80,25 +129,38 @@ void StompProtocol::proccesFromClient(){
                 break;
             }
         }
-        else{
-            handleReport(line);
-        }
     }
 
 };
 void StompProtocol::handleReport(string messege){
-    string file = "data/"+messege.substr(messege.find(' ')+1);
     string userName = client->getName();
-    names_and_events nne = parseEventsFile("data/events1.json");
-    client->getSummary().add_events_to_user(userName,nne.events);
+    string path = "data/"+messege.substr(7);
+    names_and_events nne = parseEventsFile(path);
+    // Event e("MESSEGE\ndestination:/germany_japan\nmessage-id:1\nsubscription:1\nuser:yuval\nteam a:germany\nteam b:japan\nevent name:final whistle\ntime:5400\ngeneral game updates:\n\tactive:false\nteam a updates:\nteam b updates:\ndiscription:Well, what a way to kick off Group E! Germany sit at the bottom of\0");
     for(Event e : nne.events){
+        std::cout << e.to_Frame_string(userName)<< std::endl;
         if(!client->getHandler().sendFrameAscii(e.to_Frame_string(userName),'\0')){
                 std::cout << "Disconnected. Exiting...\n" << std::endl;
                 client->Disonnect();
-                break;
+                // break;
             }
     }
-    for(auto e: client->getSummary().getMap()[userName]){
-        cout<<"\u001b[31m"+e.to_Frame_string("yuval")+"\u001b[0m"<<endl;
-        }
+}
+void StompProtocol::proccesMESSEGE(Frame& recived,string& messege){
+    map<string,string>& headers = recived.getHeaders();
+    string userName = headers["user"];
+    string clientName = client->getName();
+    string game_name = headers["team_a"]+"_"+headers["team_b"];
+    // Event t(messege);
+    // cout<<"\u001b[36m_____________________________________"<<endl;
+    // cout<<messege<<endl;
+    // cout<<"_____________________________________________________"<<endl;
+            // cout<<t.to_Frame_string("yuval")<<endl;
+            // cout<<"_____________________________________\u001b[0m"<<endl;
+    if(client->getName()==userName){
+        client->getSummary().add_event_to_user(clientName,messege);
+        return;
     }
+    client->getSummary().add_event_to_user(userName,messege);
+
+}

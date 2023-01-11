@@ -17,7 +17,56 @@ Event::Event(std::string team_a_name, std::string team_b_name, std::string name,
       team_b_updates(team_b_updates), description(discription)
 {
 }
-
+//call only when summary_o_game.size()>0
+// Event::Event(vector<Event> summary_o_game):team_a_name(summary_o_game[0].get_team_a_name()), team_b_name(summary_o_game[0].get_team_b_name()), name(""),
+// time(summary_o_game[0].get_time()), game_updates(summary_o_game[0].get_game_updates()),
+// team_a_updates(summary_o_game[0].get_team_a_updates()), team_b_updates(summary_o_game[0].get_team_b_updates()), description("Game event reports:\n")
+// {
+//     try{
+//         for(Event& e :summary_o_game){
+//             for(auto& pair: e.get_game_updates()){
+//                 game_updates[pair.first]=pair.second;
+//             }
+//             for(auto& pair: e.get_team_a_updates()){
+//                 team_a_updates[pair.first]=pair.second;
+//             }
+//             for(auto& pair: e.get_team_b_updates()){
+//                 team_b_updates[pair.first]=pair.second;
+//             }
+//             description.append(std::to_string(e.get_time())+ " - "+ e.get_name()+"\n");
+//             description.append(e.get_discription()+"\n\n");
+//         }
+//     }
+//     catch(exception& e){
+//         throw std::range_error("no elements in user summary");
+//     }
+// }
+Event::Event(vector<Event> summary_o_game):team_a_name(""), team_b_name(""), name(""), time(0), game_updates(), team_a_updates(), team_b_updates(), description("")
+{
+    try{
+        team_a_name =summary_o_game[0].get_team_a_name();
+        team_b_name = summary_o_game[0].get_team_b_name();
+        name = "";
+        time = summary_o_game[0].get_time();
+        description = "Game event reports:\n";
+        for(Event& e :summary_o_game){
+            for(auto& pair: e.get_game_updates()){
+                game_updates[pair.first]=pair.second;
+            }
+            for(auto& pair: e.get_team_a_updates()){
+                team_a_updates[pair.first]=pair.second;
+            }
+            for(auto& pair: e.get_team_b_updates()){
+                team_b_updates[pair.first]=pair.second;
+            }
+            description.append(std::to_string(e.get_time())+ " - "+ e.get_name()+"\n\n");
+            description.append(e.get_discription()+"\n\n\n");
+        }
+    }
+    catch(exception& e){
+        std::cout<<"no elements in user summary"<<std::endl;
+    }
+}
 Event::~Event()
 {
 }
@@ -64,6 +113,42 @@ const std::string &Event::get_discription() const
 
 Event::Event(const std::string &frame_body) : team_a_name(""), team_b_name(""), name(""), time(0), game_updates(), team_a_updates(), team_b_updates(), description("")
 {
+    string messege = frame_body.substr(frame_body.find("user"));
+    vector<string> messageVec = SplitMessege(messege,"\n");
+    map<string,string> game_updates_;
+    map<string,string> team_a_updates_;
+    map<string,string> team_b_updates_;
+    string discription;
+    for(int i = 0; i<(int)messageVec.size() ;i++){
+        vector<string> line = SplitMessege(messageVec[i],":");
+        if(line[0].find('\t')==0){
+            line[0].erase(line[0].find('\t'),1);
+        }
+        else if(line[0]=="team a"){
+            team_a_name = line[1];
+        }
+        else if(line[0]=="team b"){
+            team_b_name = line[1];
+        }
+        else if(line[0]=="event name"){
+            name = line[1];
+        }
+        else if(line[0]=="time"){
+            time = stoi(line[1]);
+        }
+        else if(line[0]=="general game updates"){
+            i = addToUpdatesmap(game_updates, messageVec,i,"team a updates");
+        }
+        else if(line[0]=="team a updates"){
+            i = addToUpdatesmap(team_a_updates, messageVec,i,"team b updates");
+        }
+        else if(line[0]=="team b updates"){
+            i = addToUpdatesmap(team_b_updates, messageVec,i,"discription");
+        }
+        else if(line[0]=="discription"){
+            description = line[1];
+        }
+    }
 }
 
 names_and_events parseEventsFile(std::string json_path)
@@ -120,10 +205,10 @@ string Event::to_Frame_string(string user){
     transform(team_a.begin(),team_a.end(),team_a.begin(),::tolower);
     transform(team_b.begin(),team_b.end(),team_b.begin(),::tolower);
     string answer =
-    "SEND\ndestination:/"+team_a+','+team_b+"\n\n"+
+    "SEND\ndestination:/"+team_a+'_'+team_b+"\n\n"+
     "user:"+user+"\n"+
     "team a:"+team_a+"\n"+
-    "team a:"+team_b+"\n"+
+    "team b:"+team_b+"\n"+
     "event name:"+get_name()+"\n"+
     "time:"+std::to_string(get_time())+"\n"
     "general game updates:\n";
@@ -141,12 +226,56 @@ string Event::to_Frame_string(string user){
     for(const auto& pair :team_b_updates){
         answer.append("\t"+pair.first+":"+pair.second+"\n");
     }
-    answer.append("discription:"+get_discription()+"\n\0");
+    answer.append("discription:"+get_discription()+"\0");
     return answer;
 };
-// int main(int argc, char *argv[]) {
-//     names_and_events nne = parseEventsFile("data/events1.json");
-//     vector<Event> events =nne.events;
-//     for(auto& e :events){
-//         cout<<e.to_Frame_string("yuval")<<endl;}
-// }
+string Event::to_Summary(){
+    string team_a = get_team_a_name();
+    string team_b = get_team_b_name();
+    transform(team_a.begin(),team_a.end(),team_a.begin(),::tolower);
+    transform(team_b.begin(),team_b.end(),team_b.begin(),::tolower);
+    string answer =
+    team_a+" vs "+team_b+"\nGame stats:\n"+
+    "General stats:\n";
+    map<string,string> game_updates = get_game_updates();
+    for(const auto& pair :game_updates){
+        answer.append(pair.first+": "+pair.second+"\n");
+    }
+    answer.append(team_a+" stats:\n");
+    map<string,string> team_a_updates = get_team_a_updates();
+    for(const auto& pair :team_a_updates){
+        answer.append("\t"+pair.first+":"+pair.second+"\n");
+    }
+    answer.append(team_b+" stats:\n");
+    map<string,string> team_b_updates = get_team_b_updates();
+    for(const auto& pair :team_b_updates){
+        answer.append("\t"+pair.first+":"+pair.second+"\n");
+    }
+    answer.append(get_discription());
+    return answer;
+};
+vector<string> Event::SplitMessege(string s,string delimiter){
+    size_t pos = 0;
+    string token;
+    vector<string> a;
+    while ((pos = s.find(delimiter)) != std::string::npos) {
+        token = s.substr(0, pos);
+        a.push_back(token);
+        s.erase(0, pos + delimiter.length());
+    } 
+    a.push_back(s);
+    return a;   
+}
+int Event::addToUpdatesmap(map<string,string>& updates,vector<string>& messageVec, int fromWhere,string next_updates){
+    for(int i = fromWhere; i<(int)messageVec.size() ;i++){
+        vector<string> line = SplitMessege(messageVec[i],":");
+        if(line[0] == next_updates){
+            return fromWhere--;
+        }
+        else if(line[0].find('\t')==0){
+            line[0].erase(line[0].find('\t'),1);
+            updates.insert({line[0],line[1]});
+        }
+    }
+    return fromWhere--;
+}

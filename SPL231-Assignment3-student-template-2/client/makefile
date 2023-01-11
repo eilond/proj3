@@ -1,10 +1,13 @@
 CFLAGS:=-c -Wall -Weffc++ -g -std=c++11 -Iinclude
 LDFLAGS:=-lboost_system -lpthread
  
-all: EchoClient StompWCIClient
+all: EchoClient StompWCIClient try
 
 EchoClient: bin/ConnectionHandler.o bin/echoClient.o
 	g++ -o bin/EchoClient bin/ConnectionHandler.o bin/echoClient.o $(LDFLAGS)
+
+try: bin/try.o  bin/Event.o 
+	g++ -o bin/try bin/try.o bin/Event.o $(LDFLAGS)
 
 StompWCIClient: bin/ConnectionHandler.o bin/Event.o bin/StompClient.o bin/StompProtocol.o bin/Frame.o bin/event.o bin/Game.o bin/Summary.o
 	g++ -o bin/StompWCIClient bin/ConnectionHandler.o bin/Event.o bin/StompClient.o bin/StompProtocol.o bin/Frame.o bin/Game.o bin/Summary.o $(LDFLAGS)
@@ -32,6 +35,10 @@ bin/Game.o: src/Game.cpp
 
 bin/Summary.o: src/Summary.cpp
 	g++ $(CFLAGS) -o bin/Summary.o src/Summary.cpp
+
+bin/try.o: src/try.cpp
+	g++ $(CFLAGS) -o bin/try.o src/try.cpp
+
 
 .PHONY: clean
 clean:
