@@ -71,7 +71,12 @@ ConnectionHandler& StompClient::getHandler(){return handler_;};
 void StompClient::printHandler(){std::cout<<&handler_<<std::endl;};
 Summary& StompClient::getSummary(){return summary_;};
 string StompClient::getName(){return currentUser;};
-
+bool is_int(const std::string& s)
+{
+    std::stringstream ss(s);
+    int temp;
+    return (ss >> temp) && (ss.eof());
+}
 StompClient client("127.0.0.1",7777);
 int main(int argc, char *argv[]) {
 	if (argc < 3) {
@@ -84,17 +89,22 @@ int main(int argc, char *argv[]) {
 		try{
  			const short bufsize = 1024;
 			char buf[bufsize];
+			cout<<"\033[0;32m";
 			std::cin.getline(buf, bufsize);
+			cout<<"\u001b[0m"<<endl;
 			string loginString(buf);
 			vector<string> loginline = splitMessege(loginString," ");
 			try{
 				vector<string> host_port = splitMessege(loginline[1],":");
+				if(!is_int(host_port[1])){
+					throw invalid_argument("port isnt instance of string");
+				}
 				host = host_port[0];
 				port = stoi(host_port[1]);
 			}
-			catch(exception& e){
-				cout<<e.what()<<endl;
-			}
+			catch(invalid_argument& e){
+				cout<<"\033[0;31m"<<e.what()<<"\u001b[0m"<<endl;
+			}catch(exception& e){}
 			if((loginline.size()!=4) || (loginline[0]!="login")){
 				throw std::invalid_argument("First Log To Server");
 			}
@@ -107,7 +117,7 @@ int main(int argc, char *argv[]) {
 			sever.join();
 		}
 		catch(std::exception& e){
-			cout<< e.what() << endl;
+			cout<< "\033[0;31m"<<e.what()<<"\u001b[0m" << endl;
 		}
 	};
 	// StompClient client(host,port);

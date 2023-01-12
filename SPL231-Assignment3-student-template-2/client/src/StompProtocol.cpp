@@ -35,12 +35,12 @@ void StompProtocol::Connect(string name,string password){
             cout<<"\033[0;31m"+string(47,'_')<<endl;
             cout<<recive<<endl;
             cout<<"\033[4m"+string(14,' ')+"recived from server"+string(14,' ')+"\u001b[0m"<<endl;
-          throw std::invalid_argument("no connection");
+          throw std::invalid_argument("\033[4m\033[0;31m"+string(14,' ')+"no connection"+string(14,' ')+"\u001b[0m");
         }
         else{
-            cout<<"\u001b[33m"+string(47,'_')<<endl;
-            cout<<recive<<endl;
-            cout<<"\033[4m"+string(14,' ')+"recived from server"+string(14,' ')+"\u001b[0m"<<endl;
+            // cout<<"\u001b[33m"+string(47,'_')<<endl;
+            // cout<<recive<<endl;
+            // cout<<"\033[4m"+string(14,' ')+"recived from server"+string(14,' ')+"\u001b[0m"<<endl;
             client->Connect();
             client->setName(name);
         }
@@ -93,7 +93,9 @@ void StompProtocol::proccesFromClient(){
             try{
             const short bufsize = 1024;
             char buf[bufsize];
+            cout<<"\033[0;32m";
             std::cin.getline(buf, bufsize);
+            cout<<"\u001b[0m"<<endl;
             std::string line(buf);
             Frame frameToSend(line,Client);
             if((line.substr(0,6)=="report")){
@@ -155,12 +157,12 @@ void StompProtocol::handleReport(string messege){
     string userName = client->getName();
     string path = "data/"+messege.substr(7);
     names_and_events nne = parseEventsFile(path);
-    // Event e("MESSEGE\ndestination:/germany_japan\nmessage-id:1\nsubscription:1\nuser:yuval\nteam a:germany\nteam b:japan\nevent name:final whistle\ntime:5400\ngeneral game updates:\n\tactive:false\nteam a updates:\nteam b updates:\ndiscription:Well, what a way to kick off Group E! Germany sit at the bottom of\0");
+    // Event e("MESSEGE\ndestination:/germany_japan\nmessage-id:1\nsubscription:1\nuser:yuval\nteam a:germany\nteam b:japan\nevent name:final whistle\ntime:5400\ngeneral game updates:\n\tactive:false\nteam a updates:\n\tpossession:51\nteam b updates:\ndiscription:Well, what a way to kick off Group E! Germany sit at the bottom of\0");
     for(Event e : nne.events){
         if(!client->getHandler().sendFrameAscii(e.to_Frame_string(userName),'\0')){
                 std::cout << "Disconnected. Exiting...\n" << std::endl;
                 client->Disonnect();
-                // break;
+                break;
             }
     }
 }

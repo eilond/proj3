@@ -15,9 +15,10 @@ void Summary::add_events_to_user(string user,vector<Event> v1){
     }
 };
 vector<Event> Summary::get_user_game_summary(string user,string game,string path){
+    map<string, map<string,vector<Event>>> user_summary_ = user_summary;
     vector<Event> user_game_summary = user_summary[user][game];
     try{
-        if(user_game_summary.size()>0){
+        if(user_game_summary.size()==0){
             throw invalid_argument("no summary for user");
         }
             Event sum(user_game_summary);

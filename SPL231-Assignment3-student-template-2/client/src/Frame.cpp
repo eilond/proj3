@@ -137,8 +137,7 @@ Frame::Frame(string message,Origin from):origin(nullOrigin),type(nullType),heade
         // createServerFrame(lines);
         body = message.substr(5);
     }
-    else if((lines[0]!="DISCONNECT"|lines[0]!="RECEIPT")&lines[0]!="summary") {
-        bool t = lines[0]!="RECEIPT";
+    else if(((lines[0]!="DISCONNECT")|(lines[0]!="RECEIPT"))&(lines[0]!="summary")) {
         cout<<lines.size()<<endl;
         throw std::invalid_argument("Ivalid command");
     }

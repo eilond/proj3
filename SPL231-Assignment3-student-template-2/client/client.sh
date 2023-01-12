@@ -15,6 +15,7 @@ exit germany_japan
 report events1.json 
 report events1_partial.json 
 summary germany_japan yuval clien555t.txt
-summary germany_japan yuval clien555tasdads.txt
+summary germany_japan yuval clien555tasdad.txt
+summary germany_japan yuval clie.txt
 summary germany_japan eilon client.txt
 mvn exec:java -Dexec.mainClass="bgu.spl.net.impl.stomp.StompServer" -Dexec.args="7777 tpc"

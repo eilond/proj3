@@ -247,12 +247,12 @@ string Event::to_Summary(){
     answer.append(team_a+" stats:\n");
     map<string,string> team_a_updates = get_team_a_updates();
     for(const auto& pair :team_a_updates){
-        answer.append("\t"+pair.first+":"+pair.second+"\n");
+        answer.append(pair.first+":"+pair.second+"\n");
     }
     answer.append(team_b+" stats:\n");
     map<string,string> team_b_updates = get_team_b_updates();
     for(const auto& pair :team_b_updates){
-        answer.append("\t"+pair.first+":"+pair.second+"\n");
+        answer.append(pair.first+":"+pair.second+"\n");
     }
     answer.append(get_discription());
     return answer;
