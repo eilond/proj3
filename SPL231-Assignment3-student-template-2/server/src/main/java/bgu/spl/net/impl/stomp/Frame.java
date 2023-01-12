@@ -36,7 +36,7 @@ public class Frame<T>{
     
                     if(!lines[i].equals("\u0000")){
                         if(startBody){
-                            commandBody = commandBody + lines[i];
+                            commandBody = commandBody + lines[i] + "\n";
                         }
                         else{
                             String[] header = lines[i].split(":");

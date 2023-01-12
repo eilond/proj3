@@ -25,7 +25,6 @@ public class RemoteCommandInvocationProtocol<T> implements MessagingProtocol<Ser
 
     @Override
     public void start(int connectionId, Connections<Serializable> connections) {
-        // TODO Auto-generated method stub
         
     }
 

@@ -78,7 +78,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                         retHeaders.put("subscription", Integer.toString(usrSubId));
                         retHeaders.put("message-id",Integer.toString(connections.generateMessageId()));
                         retHeaders.put("destination", topicToSendTo);
-
+                        // System.out.println(sentStompFrame.getCommandBody());
                         retFrame = createStringStompFrame("MESSAGE", retHeaders, sentStompFrame.getCommandBody());
                         connections.send(topicToSendTo, retFrame);
                     } 
