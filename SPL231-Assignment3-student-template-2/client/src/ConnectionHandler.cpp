@@ -29,7 +29,7 @@ bool ConnectionHandler::connect() {
 			throw boost::system::system_error(error);
 	}
 	catch (std::exception &e) {
-		std::cerr << "Connection failed (Error: " << e.what() << ')' << std::endl;
+		std::cerr << "Could not connect to server" << std::endl;
 		return false;
 	}
 	return true;

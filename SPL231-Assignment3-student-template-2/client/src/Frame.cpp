@@ -47,14 +47,13 @@ void Frame::createClientFrame(vector<string>& lines){
             break;
         case SUBSCRIBE:
 
-            headers.insert({"destination",lines[1]});
+            headers.insert({"destination","/"+lines[1]});
             headers.insert({"id",""}); 
             // headers.insert({"recipt",""});
             break;
         case UNSUBSCRIBE:
-            headers.insert({"destination",lines[1]});
+            headers.insert({"destination","/"+lines[1]});
             headers.insert({"id",""}); 
-            headers.insert({"receipt",""});
             break;
         case DISCONNECT: break;
             headers.insert({"receipt",""});
@@ -88,6 +87,9 @@ Frame::Frame(string message,Origin from):origin(nullOrigin),type(nullType),heade
         case Client:lines = splitMessege(message," ");break;
         case Server:lines = splitMessege(message,"\n");break;
         case nullType: lines[0]= nullptr;break;
+    }
+    if(lines[0]=="summary"&& lines.size()!=4){
+        throw std::invalid_argument("Wrong summary Structure: summary {game_name} {username} {file}");
     }
     if(lines[0] == "login"){
         type = CONNECT;
@@ -124,7 +126,7 @@ Frame::Frame(string message,Origin from):origin(nullOrigin),type(nullType),heade
         origin = Server;
         createServerFrame(lines);
     }
-    else if(lines[0] == "RECIPT"){
+    else if(lines[0] == "RECEIPT"){
         type = RECEIPT;
         origin = Server;
         createServerFrame(lines);
@@ -134,6 +136,11 @@ Frame::Frame(string message,Origin from):origin(nullOrigin),type(nullType),heade
         origin = Server;
         // createServerFrame(lines);
         body = message.substr(5);
+    }
+    else if((lines[0]!="DISCONNECT"|lines[0]!="RECEIPT")&lines[0]!="summary") {
+        bool t = lines[0]!="RECEIPT";
+        cout<<lines.size()<<endl;
+        throw std::invalid_argument("Ivalid command");
     }
 }
 const string TypeToString(ConnectionType e) throw()

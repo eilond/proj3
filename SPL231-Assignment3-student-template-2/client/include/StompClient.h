@@ -6,6 +6,7 @@
 #include "../include/Frame.h"
 #include <memory>
 #include <map>
+#include <mutex>
 
 class StompClient{
     private:
@@ -14,11 +15,13 @@ class StompClient{
         ConnectionHandler handler_;
         std::map<std::string,std::string> channel_to_id;
         bool isconnected_ = false;
+        
     public:
         int disconect_recit_delivered = 1;
         int avilable_id=1;
         int avilable_recipt=1;
         std::string currentUser;
+        mutex m_lock;
         // ConnectionHandler handler_;
         bool handshake_ = false;
         // void updateHandler(string host, short port);

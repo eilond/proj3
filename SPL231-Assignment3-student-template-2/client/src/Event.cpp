@@ -44,6 +44,9 @@ Event::Event(std::string team_a_name, std::string team_b_name, std::string name,
 Event::Event(vector<Event> summary_o_game):team_a_name(""), team_b_name(""), name(""), time(0), game_updates(), team_a_updates(), team_b_updates(), description("")
 {
     try{
+        if(summary_o_game.size()==0){
+            throw exception();
+        }
         team_a_name =summary_o_game[0].get_team_a_name();
         team_b_name = summary_o_game[0].get_team_b_name();
         name = "";
@@ -59,7 +62,7 @@ Event::Event(vector<Event> summary_o_game):team_a_name(""), team_b_name(""), nam
             for(auto& pair: e.get_team_b_updates()){
                 team_b_updates[pair.first]=pair.second;
             }
-            description.append(std::to_string(e.get_time())+ " - "+ e.get_name()+"\n\n");
+            description.append(std::to_string(e.get_time())+ " - "+ e.get_name()+":\n\n");
             description.append(e.get_discription()+"\n\n\n");
         }
     }
@@ -214,17 +217,17 @@ string Event::to_Frame_string(string user){
     "general game updates:\n";
     map<string,string> game_updates = get_game_updates();
     for(const auto& pair :game_updates){
-        answer.append("\t"+pair.first+":"+pair.second+"\n");
+        answer.append("\t"+pair.first+": "+pair.second+"\n");
     }
     answer.append("team a updates:\n");
     map<string,string> team_a_updates = get_team_a_updates();
     for(const auto& pair :team_a_updates){
-        answer.append("\t"+pair.first+":"+pair.second+"\n");
+        answer.append("\t"+pair.first+": "+pair.second+"\n");
     }
     answer.append("team b updates:\n");
     map<string,string> team_b_updates = get_team_b_updates();
     for(const auto& pair :team_b_updates){
-        answer.append("\t"+pair.first+":"+pair.second+"\n");
+        answer.append("\t"+pair.first+": "+pair.second+"\n");
     }
     answer.append("discription:"+get_discription()+"\0");
     return answer;
@@ -239,7 +242,7 @@ string Event::to_Summary(){
     "General stats:\n";
     map<string,string> game_updates = get_game_updates();
     for(const auto& pair :game_updates){
-        answer.append(pair.first+": "+pair.second+"\n");
+        answer.append(pair.first+":"+pair.second+"\n");
     }
     answer.append(team_a+" stats:\n");
     map<string,string> team_a_updates = get_team_a_updates();

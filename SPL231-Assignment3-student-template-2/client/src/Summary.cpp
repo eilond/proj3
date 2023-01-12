@@ -16,17 +16,20 @@ void Summary::add_events_to_user(string user,vector<Event> v1){
 };
 vector<Event> Summary::get_user_game_summary(string user,string game,string path){
     vector<Event> user_game_summary = user_summary[user][game];
-    if(user_game_summary.size()>0){
-        Event sum(user_game_summary);
-        string path1 = "./data/"+path;
-        std::ofstream file(path1);
-        string a = sum.to_Summary();
-        cout<<a<<endl;
-        file << a;
-        file.close();
+    try{
+        if(user_game_summary.size()>0){
+            throw invalid_argument("no summary for user");
+        }
+            Event sum(user_game_summary);
+            string path1 = "./data/"+path;
+            std::ofstream file(path1);
+            string a = sum.to_Summary();
+            cout<<a<<endl;
+            file << a;
+            file.close();
     }
-    else{
-        cout<<"no user game events"<<endl;
+    catch(exception& e){
+        std::cout<<e.what()<<std::endl;
     }
     return user_game_summary;
     

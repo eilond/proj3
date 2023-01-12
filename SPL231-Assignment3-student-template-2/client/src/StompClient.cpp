@@ -40,6 +40,12 @@ void StompClient::checkFrame(Frame& frame){
 		avilable_id++;
 		avilable_recipt++;
 	}
+	if(frame.getType()==UNSUBSCRIBE){
+		string a = channel_to_id[frame.getHeaders()["destination"]];
+		channel_to_id.erase(frame.getHeaders()["destination"]);
+        frame.modifyHeader("id",a);
+		disconect_recit_delivered = avilable_id;
+	}
 };
 void StompClient::Connect(){isconnected_ = true;};
 
@@ -56,9 +62,7 @@ void StompClient::setDisonnectRecit(int a){
 	// 	throw std::invalid_argument("somthing wrong with recipt id resived from server");}
 	disconect_recit_delivered = a;
 };
-StompClient::StompClient(string host, short port):summary_(),game_(),handler_(host,port),channel_to_id(),currentUser(){
-	// static ConnectionHandler tmp(host,port);
-	// handler_ = &tmp;
+StompClient::StompClient(string host, short port):summary_(),game_(),handler_(host,port),channel_to_id(),currentUser(),m_lock(){
 };
 StompClient::~StompClient(){
 };
@@ -76,10 +80,6 @@ int main(int argc, char *argv[]) {
     }
     std::string host = argv[1];
     short port = atoi(argv[2]);
-	// names_and_events nne = parseEventsFile("data/events1_partial.json");
-	// for(auto e: nne.events){
-    //     cout<<e.to_Frame_string("yuval")<<endl;
-    //     }
 	while(1){
 		try{
  			const short bufsize = 1024;
@@ -87,6 +87,14 @@ int main(int argc, char *argv[]) {
 			std::cin.getline(buf, bufsize);
 			string loginString(buf);
 			vector<string> loginline = splitMessege(loginString," ");
+			try{
+				vector<string> host_port = splitMessege(loginline[1],":");
+				host = host_port[0];
+				port = stoi(host_port[1]);
+			}
+			catch(exception& e){
+				cout<<e.what()<<endl;
+			}
 			if((loginline.size()!=4) || (loginline[0]!="login")){
 				throw std::invalid_argument("First Log To Server");
 			}
