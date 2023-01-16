@@ -55,7 +55,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                     if(connections.sighInIsLegal(usrName, passcode)){ //correct password from client
                         if(connections.isUserConnected(usrName)){ //someone is logged in 
                             
-                            retHeaders.put("message","user is already logged in");
+                            retHeaders.put("message","User already logged in");
                             disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");
                         }
                         else{ //no one is logged in 
@@ -63,7 +63,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                         }
                     }
                     else{//incorrect password from client
-                        retHeaders.put("message","wrong password");
+                        retHeaders.put("message","Wrong password");
                         disconnectUsr("ERROR", retHeaders, "the message:\n" + "------------\n" + sentStompFrame.getFrameSent() + "\n------------");
                     }
                 }
