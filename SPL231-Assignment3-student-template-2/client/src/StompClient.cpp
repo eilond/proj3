@@ -55,11 +55,6 @@ int StompClient::getDisconectRecit(){return disconect_recit_delivered;};
 void StompClient::DisconectRecitTrue(){disconect_recit_delivered = 1;};
 void StompClient::DisonnectRecitFalse(){disconect_recit_delivered = 0;};
 void StompClient::setDisonnectRecit(int a){
-	// disconect_recit_delivered = stoi(a);
-	// cout<<stoi(a)<<endl;
-	// if(stoi(a)==0){
-	// 	cout<<"here"<<endl;
-	// 	throw std::invalid_argument("somthing wrong with recipt id resived from server");}
 	disconect_recit_delivered = a;
 };
 StompClient::StompClient(string host, short port):summary_(),game_(),handler_(host,port),channel_to_id(),currentUser(),m_lock(){
@@ -67,7 +62,6 @@ StompClient::StompClient(string host, short port):summary_(),game_(),handler_(ho
 StompClient::~StompClient(){
 };
 ConnectionHandler& StompClient::getHandler(){return handler_;};
-// void StompClient::updateHandler(string host, short port){handler_.updateHandler(host,port);};
 void StompClient::printHandler(){std::cout<<&handler_<<std::endl;};
 Summary& StompClient::getSummary(){return summary_;};
 string StompClient::getName(){return currentUser;};
@@ -89,9 +83,7 @@ int main(int argc, char *argv[]) {
 		try{
  			const short bufsize = 1024;
 			char buf[bufsize];
-			cout<<"\033[0;32m";
 			std::cin.getline(buf, bufsize);
-			cout<<"\u001b[0m"<<endl;
 			string loginString(buf);
 			vector<string> loginline = splitMessege(loginString," ");
 			try{
@@ -103,7 +95,7 @@ int main(int argc, char *argv[]) {
 				port = stoi(host_port[1]);
 			}
 			catch(invalid_argument& e){
-				cout<<"\033[0;31m"<<e.what()<<"\u001b[0m"<<endl;
+				cout<<e.what()<<endl;
 			}catch(exception& e){}
 			if((loginline.size()!=4) || (loginline[0]!="login")){
 				throw std::invalid_argument("First Log To Server");
@@ -117,18 +109,8 @@ int main(int argc, char *argv[]) {
 			sever.join();
 		}
 		catch(std::exception& e){
-			cout<< "\033[0;31m"<<e.what()<<"\u001b[0m" << endl;
+			cout<<e.what()<< endl;
 		}
 	};
-	// StompClient client(host,port);
-	// Frame a("join 111",Client);
-	// client.checkFrame(a);
-	// std::cout<<a.toString()<<std::endl;
-	// names_and_events nne = parseEventsFile("data/events1_partial.json");
-	// std::string t = nne.events[0].get_team_a_name();
-	// std::string x = nne.events[1].get_discription();
-	// t[0]=std::tolower(t[0]);
-	// std::cout<<t<<std::endl;
-	// std::cout<<x<<std::endl;
 	return 0;
 }

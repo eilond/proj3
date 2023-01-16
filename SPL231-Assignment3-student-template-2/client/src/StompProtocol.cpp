@@ -20,9 +20,6 @@ StompClient* StompProtocol:: getClient(){return client;};
 void StompProtocol::Connect(string name,string password){
     if(client->getHandler().connect()){
         std::string line = "CONNECT\naccept-version:1.2\nhost:stomp.cs.bgu.ac.il\nlogin:"+name+"\npasscode:"+password+"\n\0";
-        // cout<<"\u001b[31m________________________________________"<<endl;
-        // cout<<line<<endl;
-        // cout<<"_____________________________________\u001b[0m"<<endl;
         if (!client->getHandler().sendFrameAscii(line,'\0')) {
                 std::cout << "Disconnected. Exiting...\n" << std::endl;
             }
@@ -32,15 +29,14 @@ void StompProtocol::Connect(string name,string password){
         }
         Frame fromServer(recive,Server);
         if(fromServer.getType()!=CONNECTED){
-            cout<<"\033[0;31m"+string(47,'_')<<endl;
-            cout<<recive<<endl;
-            cout<<"\033[4m"+string(14,' ')+"recived from server"+string(14,' ')+"\u001b[0m"<<endl;
-          throw std::invalid_argument("\033[4m\033[0;31m"+string(14,' ')+"no connection"+string(14,' ')+"\u001b[0m");
+            cout<<fromServer.getHeaders()["message"]<<endl;
         }
         else{
-            // cout<<"\u001b[33m"+string(47,'_')<<endl;
-            // cout<<recive<<endl;
-            // cout<<"\033[4m"+string(14,' ')+"recived from server"+string(14,' ')+"\u001b[0m"<<endl;
+            if(fromServer.getType()==CONNECTED){
+                client->m_lock.lock();
+                std::cout<<"Login successful"<<std::endl;
+                client->m_lock.unlock();
+            }
             client->Connect();
             client->setName(name);
         }
@@ -61,7 +57,7 @@ void StompProtocol::proccesFromServer(){
             client->m_lock.lock();
             proccesMESSEGE(recived,recive);
             client->m_lock.unlock();
-        }
+        } 
         // the addition of the || in the end might not work;
         //join /germany_japan
         // //report events1.json
@@ -73,17 +69,14 @@ void StompProtocol::proccesFromServer(){
             client->getHandler().close();
             client->Disonnect();
         }
-        if(!client->isConnected()&&(recived.getType()==ERROR)){
+        if(recived.getType()==ERROR){
             client->handshake_ = true;
+            std::cout<<recived.getHeaders()["message"]<<std::endl;
             client->getHandler().close();
             client->Disonnect();
         }
         if(recived.getType()!=MESSAGE){
             client->m_lock.lock();
-            // if(recived.getType()==ERROR){cout<<"\033[0;31m"+string(47,'_')<<endl;}
-            // else{cout<<"\u001b[33m"+string(47,'_')<<endl;}
-            // cout<<recive<<endl;
-            // cout<<"\033[4m"+string(14,' ')+"recived from server"+string(14,' ')+"\u001b[0m"<<endl;
             client->m_lock.unlock();
         }
     }
@@ -93,9 +86,7 @@ void StompProtocol::proccesFromClient(){
             try{
             const short bufsize = 1024;
             char buf[bufsize];
-            cout<<"\033[0;32m";
             std::cin.getline(buf, bufsize);
-            cout<<"\u001b[0m"<<endl;
             std::string line(buf);
             Frame frameToSend(line,Client);
             if((line.substr(0,6)=="report")){
@@ -116,17 +107,13 @@ void StompProtocol::proccesFromClient(){
             }
             else if((line.substr(0,5)=="login")){
                 client->m_lock.lock();
-                cout<<"\u001b[31mClient already logged in\u001b[0m"<<endl;
+                cout<<"The Client is already logged in, log out before trying again"<<endl;
                 client->m_lock.unlock();
             }
             else{
                 client->checkFrame(frameToSend);
                 line = frameToSend.toString();
-                //about to send
                 client->m_lock.lock();
-                // cout<<"\u001b[32m"+string(47,'_')<<endl;
-                // cout<<line<<endl;
-                // cout<<string(47,'_')+"\u001b[0m"<<endl;
                 client->m_lock.unlock();
                 if(frameToSend.getType() == DISCONNECT){
                     client->Disonnect();
@@ -138,16 +125,21 @@ void StompProtocol::proccesFromClient(){
                     client->m_lock.unlock();
                     break;
                 }
+                if(frameToSend.getType()==SUBSCRIBE){
+                    client->m_lock.lock();
+                    cout<<"Joined channel "<<frameToSend.getHeaders()["destination"].substr(1)<<endl;
+                    client->m_lock.unlock();
+                }
                 if(frameToSend.getType()==UNSUBSCRIBE){
                     client->m_lock.lock();
-                    cout<<"\u001b[33mExited channel "<<frameToSend.getHeaders()["destination"].substr(1)+"\u001b[0m"<<endl;
+                    cout<<"Exited channel "<<frameToSend.getHeaders()["destination"].substr(1)<<endl;
                     client->m_lock.unlock();
                 }
             }
         }
         catch(exception& e){
                 client->m_lock.lock();
-                cout<<"\033[0;31m"<<e.what()<<"\u001b[0m"<<endl;
+                cout<<e.what()<<endl;
                 client->m_lock.unlock();
             }
     }
@@ -157,7 +149,6 @@ void StompProtocol::handleReport(string messege){
     string userName = client->getName();
     string path = "data/"+messege.substr(7);
     names_and_events nne = parseEventsFile(path);
-    // Event e("MESSEGE\ndestination:/germany_japan\nmessage-id:1\nsubscription:1\nuser:yuval\nteam a:germany\nteam b:japan\nevent name:final whistle\ntime:5400\ngeneral game updates:\n\tactive:false\nteam a updates:\n\tpossession:51\nteam b updates:\ndiscription:Well, what a way to kick off Group E! Germany sit at the bottom of\0");
     for(Event e : nne.events){
         if(!client->getHandler().sendFrameAscii(e.to_Frame_string(userName),'\0')){
                 std::cout << "Disconnected. Exiting...\n" << std::endl;

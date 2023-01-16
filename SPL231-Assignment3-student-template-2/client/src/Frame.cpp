@@ -134,8 +134,8 @@ Frame::Frame(string message,Origin from):origin(nullOrigin),type(nullType),heade
     else if(lines[0] == "ERROR"){
         type = ERROR;
         origin = Server;
-        // createServerFrame(lines);
-        body = message.substr(5);
+        std::vector<std::string> reason = splitMessege(lines[1],":");
+        headers.insert({"message",reason[1]});
     }
     else if(((lines[0]!="DISCONNECT")|(lines[0]!="RECEIPT"))&(lines[0]!="summary")) {
         cout<<lines.size()<<endl;
